@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Inbetweeneers Live</title>
+<meta name="description" content="Live scores for this week's Inbetweeneers acca picks.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Martian+Mono:wght@400;600;700&display=swap">
+<style>
+/* Layout: one column of match cards, in acca order; status bar on top. */
+:root{
+  --page:#f4f6f8; --sheet:#ffffff; --ink:#0d1b2e; --muted:#5f6b7a; --rule:#dde3ea;
+  --head:#0d1b2e; --gold:#ffd447;
+  --win:#16824a; --win-soft:#e3f3ea; --draw:#b7791f; --draw-soft:#fdf3dc; --lose:#d23b30; --lose-soft:#fbe7e5;
+  --body:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Martian Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --page:#0a121d; --sheet:#111c2b; --ink:#e8eef6; --muted:#97a3b4; --rule:#23324a; --head:#1c2b42;
+  --win:#4cc985; --win-soft:#12301f; --draw:#f0b429; --draw-soft:#33290f; --lose:#ff7a6e; --lose-soft:#3a1c1b; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--page);color:var(--ink);font:15px/1.4 var(--body);padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+.wrap{max-width:640px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));display:grid;gap:14px}
+header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px 12px}
+h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.01em}
+h1 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--lose);margin-right:8px;vertical-align:2px}
+.date{color:var(--muted);font-size:14px}
+.bar{background:var(--head);color:#fff;border-radius:14px;padding:14px 16px;display:grid;gap:6px}
+.bar .big{font-weight:800;font-size:18px}
+.bar .small{font-size:13px;color:#c3d0e2;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px}
+.bar .verdict.win{color:#7ee2a8} .bar .verdict.lose{color:#ffa39b}
+.cards{display:grid;gap:10px;list-style:none;margin:0;padding:0}
+.card{background:var(--sheet);border-radius:14px;padding:14px 16px;box-shadow:0 0 0 1px var(--rule),0 10px 24px -16px rgba(13,27,46,.3);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;border-left:6px solid var(--rule)}
+.card.win{border-left-color:var(--win)} .card.draw{border-left-color:var(--draw)} .card.lose{border-left-color:var(--lose)}
+.who{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.who .odds{font-family:var(--mono);font-weight:600;letter-spacing:0;text-transform:none;margin-left:6px}
+.teams{display:grid;gap:2px;min-width:0}
+.line{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-size:15px}
+.line .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.line.ours .nm{font-weight:800}
+.line .g{font:700 20px var(--mono);min-width:22px;text-align:right}
+.side{display:grid;justify-items:end;gap:6px;align-self:start}
+.st{font:700 12px var(--mono);padding:3px 9px;border-radius:999px;white-space:nowrap;background:var(--page);box-shadow:inset 0 0 0 1px var(--rule);color:var(--muted)}
+.st.live{background:var(--lose);color:#fff;box-shadow:none}
+.st.ht{background:var(--draw-soft);color:var(--draw);box-shadow:inset 0 0 0 1px var(--draw)}
+.st.ft{background:var(--ink);color:var(--page);box-shadow:none}
+.mood{font:800 11px var(--body);letter-spacing:.06em;text-transform:uppercase}
+.mood.win{color:var(--win)} .mood.draw{color:var(--draw)} .mood.lose{color:var(--lose)}
+.goals{grid-column:1/-1;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 10px}
+.goals:empty{display:none}
+.fs{grid-column:1/-1;font-size:12.5px;color:var(--muted)}
+.fs a,.foot a{color:var(--ink)}
+.goalflash{grid-column:1/-1;justify-self:start;font:800 13px var(--body);letter-spacing:.1em;color:#0d1b2e;background:var(--gold);padding:3px 10px;border-radius:6px}
+.foot{font-size:12.5px;color:var(--muted);display:grid;gap:6px}
+.foot p{margin:0}
+.foot a.btn{display:inline-block;font:700 14px var(--body);padding:10px 14px;border-radius:999px;background:var(--ink);color:var(--page);text-decoration:none}
+a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.err{background:var(--lose-soft);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:13px}
+@media (prefers-reduced-motion:no-preference){
+  h1 .dot{animation:blink 1.4s ease-in-out infinite}
+  .st.live{animation:pulse 1.6s ease-out infinite}
+  .card.flash{animation:flash 1.2s ease-out 3}
+  .goalflash{animation:pop .5s cubic-bezier(.3,1.8,.5,1) both}
+  @keyframes blink{50%{opacity:.25}}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(210,59,48,.55)}100%{box-shadow:0 0 0 8px rgba(210,59,48,0)}}
+  @keyframes flash{0%{background:var(--gold)}100%{background:var(--sheet)}}
+  @keyframes pop{from{transform:scale(1.6)}to{transform:none}}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1><span class="dot" aria-hidden="true"></span>Inbetweeneers Live</h1><span class="date" id="date"></span></header>
+  <section class="bar" aria-live="polite"><div class="big" id="summary">Loading scores…</div><div class="small"><span id="verdict" class="verdict"></span><span id="updated"></span></div></section>
+  <ul class="cards" id="cards"></ul>
+  <div class="foot">
+    <p><a class="btn" id="accaLink" href="#">← Back to the acca table</a></p>
+    <p>Scores from ESPN, checked every 30 seconds while this page is open. Hamilton's league isn't in that feed, so use its Flashscore link. If the page has been in the background, pull down or reopen to refresh.</p>
+  </div>
+</div>
+<script>
+(function(){
+  const POLL_MS = 30000;
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  let cfg = null, last = {}, lastOk = 0, flashUntil = {};
+
+  function ukDate(iso){ const d = new Date(iso+"T12:00:00"); return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
+  function ukTime(d){ return d.toLocaleTimeString("en-GB",{hour:"numeric",minute:"2-digit",hour12:true,timeZone:"Europe/London"}).replace(":00","").replace(/\s/g,"").toLowerCase(); }
+
+  async function loadConfig(){
+    const r = await fetch("picks.json?ts="+Date.now(), {cache:"no-store"});
+    if (!r.ok) throw new Error("picks");
+    cfg = await r.json();
+    $("date").textContent = ukDate(cfg.date);
+    if (cfg.accaPage && /^https:\/\/claude\.ai\//.test(cfg.accaPage)) $("accaLink").href = cfg.accaPage;
+  }
+
+  async function fetchLeague(lg){
+    const day = cfg.date.replace(/-/g,"");
+    const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${lg}/scoreboard?dates=${day}`, {cache:"no-store"});
+    if (!r.ok) throw new Error(lg);
+    return r.json();
+  }
+
+  function readEvent(ev, p){
+    const c = ev.competitions[0];
+    const ours = c.competitors.find(x => x.team.displayName === p.espnTeam) || c.competitors.find(x => x.team.displayName.includes(p.team.split(" ")[0]));
+    const them = c.competitors.find(x => x !== ours);
+    const st = c.status.type;
+    const goals = (c.details||[]).filter(d => d.scoringPlay).map(d => ({
+      clock: d.clock && d.clock.displayValue || "",
+      name: (d.athletesInvolved && d.athletesInvolved[0] && d.athletesInvolved[0].shortName) || "Goal",
+      ours: d.team && ours && d.team.id === ours.team.id,
+      og: !!d.ownGoal, pen: !!d.penaltyKick
+    }));
+    return {
+      state: st.state, // pre | in | post
+      detail: st.shortDetail || st.description || "",
+      completed: !!st.completed,
+      usName: ours ? ours.team.displayName : p.team, themName: them ? them.team.displayName : "",
+      us: ours ? +ours.score : 0, them: them ? +them.score : 0,
+      home: ours ? ours.homeAway === "home" : true,
+      start: new Date(ev.date), goals
+    };
+  }
+
+  function statusChip(m){
+    if (!m) return `<span class="st">–</span>`;
+    if (m.state === "pre") return `<span class="st">${esc(ukTime(m.start))}</span>`;
+    if (m.state === "post") return `<span class="st ft">FT</span>`;
+    if (/HT|half/i.test(m.detail)) return `<span class="st ht">HT</span>`;
+    return `<span class="st live">● ${esc(m.detail)}</span>`;
+  }
+  const moodOf = m => !m || m.state === "pre" ? "" : m.us > m.them ? "win" : m.us === m.them ? "draw" : "lose";
+  const moodText = (mood, m) => !mood ? "" : m.state === "post" ? (mood==="win"?"Won":"Lost") : (mood==="win"?"Winning":mood==="draw"?"Drawing":"Losing");
+
+  function render(results){
+    const now = Date.now();
+    let started=0, winning=0, finished=0, lostFinal=false;
+    $("cards").innerHTML = cfg.picks.map((p, i) => {
+      const m = results[i];
+      if (!p.event){
+        return `<li class="card"><div class="teams"><div class="who">${esc(p.who)}<span class="odds">${esc(p.odds||"")}</span></div>
+          <div class="line ours"><span class="nm">${esc(p.team)}</span></div><div class="line"><span class="nm">${p.away?"at ":"v "}${esc(p.opponent||"")}</span></div></div>
+          <div class="side"><span class="st">${esc(p.ko||"")}</span></div>
+          <div class="fs">Not in the live feed. <a href="${esc(p.fs)}" target="_blank" rel="noopener">Live score on Flashscore ↗</a></div></li>`;
+      }
+      const mood = moodOf(m);
+      if (m && m.state !== "pre") { started++; if (mood==="win") winning++; }
+      if (m && m.state === "post") { finished++; if (mood!=="win") lostFinal = true; }
+      const key = p.event, sig = m ? m.us+"-"+m.them : "";
+      if (last[key] !== undefined && last[key] !== sig && m && m.state !== "pre") flashUntil[key] = now + 20000;
+      last[key] = sig;
+      const flashing = flashUntil[key] && flashUntil[key] > now;
+      const homeLine = m ? (m.home ? [m.usName,m.us,true] : [m.themName,m.them,false]) : [p.team,"",true];
+      const awayLine = m ? (m.home ? [m.themName,m.them,false] : [m.usName,m.us,true]) : ["","",false];
+      const gl = m && m.goals.length ? m.goals.map(g => `${g.ours?"⚽":"·"} ${esc(g.name)} ${esc(g.clock)}${g.pen?" (pen)":""}${g.og?" (og)":""}`).join("</span><span>") : "";
+      return `<li class="card ${mood}${flashing?" flash":""}">
+        ${flashing?`<span class="goalflash">GOAL!</span>`:""}
+        <div class="teams"><div class="who">${esc(p.who)}<span class="odds">${esc(p.odds||"")}</span></div>
+          <div class="line${homeLine[2]?" ours":""}"><span class="nm">${esc(homeLine[0])}</span><span class="g">${m&&m.state!=="pre"?homeLine[1]:""}</span></div>
+          <div class="line${awayLine[2]?" ours":""}"><span class="nm">${esc(awayLine[0])}</span><span class="g">${m&&m.state!=="pre"?awayLine[1]:""}</span></div></div>
+        <div class="side">${statusChip(m)}<span class="mood ${mood}">${moodText(mood,m)}</span></div>
+        ${gl?`<div class="goals"><span>${gl}</span></div>`:""}
+        <div class="fs"><a href="${esc(p.fs)}" target="_blank" rel="noopener">Flashscore ↗</a></div>
+      </li>`;
+    }).join("");
+    const tracked = cfg.picks.filter(p=>p.event).length;
+    let summary, verdict = "", vclass = "";
+    if (!started) summary = `Kick-off ${results.find(Boolean) ? ukTime(results.find(Boolean).start) : ""} · ${tracked} games tracked live`;
+    else if (finished === tracked) summary = `Full time · ${winning} of ${tracked} won`;
+    else summary = `${winning} of ${started} winning right now${finished?` · ${finished} finished`:""}`;
+    if (lostFinal) { verdict = "Acca's gone: one pick has lost"; vclass = "lose"; }
+    else if (started) {
+      const allWin = cfg.picks.every((p,i)=>!p.event || moodOf(results[i])==="win");
+      verdict = allWin ? "If it ended now, the acca lands (plus Hamilton)" : "If it ended now, the acca loses";
+      vclass = allWin ? "win" : "lose";
+    }
+    $("summary").textContent = summary;
+    $("verdict").textContent = verdict; $("verdict").className = "verdict " + vclass;
+  }
+
+  async function tick(){
+    try {
+      const leagues = [...new Set(cfg.picks.map(p=>p.league).filter(Boolean))];
+      const boards = Object.fromEntries(await Promise.all(leagues.map(async lg => [lg, await fetchLeague(lg)])));
+      const results = cfg.picks.map(p => {
+        if (!p.event) return null;
+        const ev = (boards[p.league].events||[]).find(e => String(e.id) === String(p.event));
+        return ev ? readEvent(ev, p) : null;
+      });
+      render(results); lastOk = Date.now();
+      const err = document.getElementById("err"); if (err) err.remove();
+    } catch(e){
+      if (!document.getElementById("err")) $("cards").insertAdjacentHTML("beforebegin", `<div class="err" id="err">Couldn't reach the live scores just now. Trying again in 30 seconds.</div>`);
+    }
+  }
+  setInterval(() => { if (lastOk) $("updated").textContent = `Updated ${Math.round((Date.now()-lastOk)/1000)}s ago`; }, 1000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && cfg) tick(); });
+
+  loadConfig().then(() => { tick(); setInterval(tick, POLL_MS); })
+    .catch(() => { $("summary").textContent = "Couldn't load this week's picks."; });
+})();
+</script>
+</body>
+</html>
