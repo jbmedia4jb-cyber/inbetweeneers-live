@@ -3,110 +3,230 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#060b14">
 <title>Inbetweeneers Live</title>
 <meta name="description" content="Live scores for this week's Inbetweeneers acca picks.">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Martian+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Martian+Mono:wght@400;600;700&display=swap">
 <style>
-/* Layout: one column of match cards, in acca order; status bar on top. */
+/* TV matchday look: always dark, floodlit, score-graphic cards. */
 :root{
-  --page:#f4f6f8; --sheet:#ffffff; --ink:#0d1b2e; --muted:#5f6b7a; --rule:#dde3ea;
-  --head:#0d1b2e; --gold:#ffd447;
-  --win:#16824a; --win-soft:#e3f3ea; --draw:#b7791f; --draw-soft:#fdf3dc; --lose:#d23b30; --lose-soft:#fbe7e5;
+  --bg:#050a12; --panel:#0d1626; --panel2:#121e33; --ink:#eef3fb; --muted:#8d9bb2; --rule:rgba(255,255,255,.09);
+  --win:#3ee08a; --draw:#ffc23d; --lose:#ff5a4e; --gold:#ffd447; --live:#ff3b30; --sky:#7fb6ff;
   --body:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"Martian Mono",ui-monospace,Consolas,monospace;
-  color-scheme:light;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme: dark){:root{
-  --page:#0a121d; --sheet:#111c2b; --ink:#e8eef6; --muted:#97a3b4; --rule:#23324a; --head:#1c2b42;
-  --win:#4cc985; --win-soft:#12301f; --draw:#f0b429; --draw-soft:#33290f; --lose:#ff7a6e; --lose-soft:#3a1c1b; color-scheme:dark}}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--page);color:var(--ink);font:15px/1.4 var(--body);padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
-.wrap{max-width:640px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));display:grid;gap:14px}
-header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px 12px}
-h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.01em}
-h1 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--lose);margin-right:8px;vertical-align:2px}
-.date{color:var(--muted);font-size:14px}
-.bar{background:var(--head);color:#fff;border-radius:14px;padding:14px 16px;display:grid;gap:6px}
-.bar .big{font-weight:800;font-size:18px}
-.bar .small{font-size:13px;color:#c3d0e2;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px}
-.bar .verdict.win{color:#7ee2a8} .bar .verdict.lose{color:#ffa39b}
-.cards{display:grid;gap:10px;list-style:none;margin:0;padding:0}
-.card{background:var(--sheet);border-radius:14px;padding:14px 16px;box-shadow:0 0 0 1px var(--rule),0 10px 24px -16px rgba(13,27,46,.3);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;border-left:6px solid var(--rule)}
-.card.win{border-left-color:var(--win)} .card.draw{border-left-color:var(--draw)} .card.lose{border-left-color:var(--lose)}
-.who{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.who .odds{font-family:var(--mono);font-weight:600;letter-spacing:0;text-transform:none;margin-left:6px}
-.teams{display:grid;gap:2px;min-width:0}
-.line{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-size:15px}
-.line .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.line.ours .nm{font-weight:800}
-.line .g{font:700 20px var(--mono);min-width:22px;text-align:right}
-.side{display:grid;justify-items:end;gap:6px;align-self:start}
-.st{font:700 12px var(--mono);padding:3px 9px;border-radius:999px;white-space:nowrap;background:var(--page);box-shadow:inset 0 0 0 1px var(--rule);color:var(--muted)}
-.st.live{background:var(--lose);color:#fff;box-shadow:none}
-.st.ht{background:var(--draw-soft);color:var(--draw);box-shadow:inset 0 0 0 1px var(--draw)}
-.st.ft{background:var(--ink);color:var(--page);box-shadow:none}
-.mood{font:800 11px var(--body);letter-spacing:.06em;text-transform:uppercase}
+body{min-height:100vh;color:var(--ink);font:15px/1.4 var(--body);
+  background:
+    radial-gradient(ellipse 55% 32% at 12% -4%, rgba(170,205,255,.20), transparent 70%),
+    radial-gradient(ellipse 55% 32% at 88% -4%, rgba(170,205,255,.20), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(60,160,90,.045) 0 64px, transparent 64px 128px),
+    linear-gradient(180deg,#0a1424 0%, var(--bg) 55%);
+  background-color:var(--bg);
+  padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);overflow-x:hidden}
+/* Floodlight beams */
+body::before{content:"";position:fixed;inset:-20% -10% auto;height:70vh;pointer-events:none;z-index:0;
+  background:conic-gradient(from 160deg at 10% 0%, transparent 0 6deg, rgba(200,225,255,.07) 10deg, transparent 16deg),
+             conic-gradient(from 184deg at 90% 0%, transparent 0 6deg, rgba(200,225,255,.07) 10deg, transparent 16deg)}
+.wrap{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));display:grid;gap:14px}
+.wrap > *{min-width:0}
+
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:4px 12px;flex-wrap:wrap}
+.brand{display:grid;line-height:1}
+.kicker{font:800 11px var(--body);letter-spacing:.32em;color:var(--sky);text-transform:uppercase}
+h1{margin:4px 0 0;font:900 34px/1 var(--body);font-stretch:68%;letter-spacing:.01em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+h1 .live{display:inline-flex;align-items:center;gap:6px;font:800 12px var(--body);font-stretch:100%;letter-spacing:.12em;background:var(--live);color:#fff;padding:4px 9px 4px 8px;border-radius:4px}
+h1 .live i{width:7px;height:7px;border-radius:50%;background:#fff}
+.date{color:var(--muted);font-size:13px;font-weight:600}
+
+/* Ticker */
+.ticker{position:relative;overflow:hidden;border-radius:8px;background:linear-gradient(90deg,#0f1a2d,#16243d);box-shadow:inset 0 0 0 1px var(--rule);height:34px;display:flex;align-items:center;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.track{display:flex;align-items:center;gap:14px;white-space:nowrap;padding-left:14px;font:600 12.5px var(--mono);will-change:transform}
+.ti{display:inline-flex;align-items:center;gap:7px}
+.ti b{font:800 11px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--sky)}
+.ti em{font-style:normal;color:var(--muted)}
+.ti.win .sc{color:var(--win)} .ti.draw .sc{color:var(--draw)} .ti.lose .sc{color:var(--lose)}
+.sep{color:var(--live);font-size:9px}
+
+/* HUD */
+.hud{position:relative;overflow:hidden;border-radius:16px;padding:14px 16px 13px;background:linear-gradient(160deg,#13213a,#0b1322);box-shadow:inset 0 0 0 1px var(--rule),0 18px 40px -24px #000;display:grid;gap:10px}
+.lights{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.lt{display:grid;justify-items:center;gap:5px;min-width:0}
+.bulb{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:900 15px var(--body);color:#06101c;background:#24334d;box-shadow:inset 0 -3px 6px rgba(0,0,0,.35)}
+.lt.win .bulb{background:var(--win);box-shadow:0 0 14px 2px rgba(62,224,138,.55)}
+.lt.draw .bulb{background:var(--draw);box-shadow:0 0 14px 2px rgba(255,194,61,.45)}
+.lt.lose .bulb{background:var(--lose);box-shadow:0 0 14px 2px rgba(255,90,78,.5)}
+.lt .nm{font:800 10px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.big{font:900 22px/1.1 var(--body);font-stretch:75%;letter-spacing:.01em;text-transform:uppercase}
+.big .n{color:var(--gold)}
+.small{font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px}
+.verdict{font-weight:700}
+.verdict.win{color:var(--win)} .verdict.lose{color:var(--lose)}
+.hud.oncourse{box-shadow:inset 0 0 0 1px rgba(255,212,71,.5),0 0 34px -8px rgba(255,212,71,.45)}
+.hud.landed{background:linear-gradient(160deg,#3b2f08,#14110a);box-shadow:inset 0 0 0 2px var(--gold),0 0 44px -6px rgba(255,212,71,.7)}
+.hud::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;background:linear-gradient(110deg,transparent 30%,rgba(255,230,140,.22) 48%,transparent 66%);background-size:250% 100%}
+.hud.oncourse::after,.hud.landed::after{opacity:1}
+
+/* Cards */
+.cards{display:grid;gap:12px;list-style:none;margin:0;padding:0}
+.card{--team:var(--sky);position:relative;overflow:hidden;background:linear-gradient(165deg,var(--panel2),var(--panel));border-radius:16px;padding:12px 14px 14px 18px;
+  box-shadow:inset 0 0 0 1px var(--rule),0 16px 34px -22px #000;display:grid;gap:10px}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--team)}
+.card.win{box-shadow:inset 0 0 0 1px rgba(62,224,138,.45),0 0 26px -10px rgba(62,224,138,.55)}
+.card.draw{box-shadow:inset 0 0 0 1px rgba(255,194,61,.4),0 0 24px -12px rgba(255,194,61,.45)}
+.card.lose{box-shadow:inset 0 0 0 1px rgba(255,90,78,.45),0 0 26px -10px rgba(255,90,78,.5)}
+.card.flash{box-shadow:inset 0 0 0 2px var(--gold),0 0 34px -6px rgba(255,212,71,.7)}
+.ch{display:flex;align-items:center;gap:8px;min-width:0}
+.who{font:800 12px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+.odds{font:700 11px var(--mono);color:var(--gold);background:rgba(255,212,71,.1);padding:2px 7px;border-radius:5px}
+.ch .sp{flex:1}
+.mood{font:900 11px var(--body);letter-spacing:.14em;text-transform:uppercase}
 .mood.win{color:var(--win)} .mood.draw{color:var(--draw)} .mood.lose{color:var(--lose)}
-.goals{grid-column:1/-1;font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 6px;padding-top:2px}
-.goals .ev{background:var(--page);border-radius:6px;padding:2px 7px;white-space:nowrap}
-.goals .ev b{font:600 11px var(--mono)}
-.goals .ev.us{color:var(--ink);font-weight:700;box-shadow:inset 0 0 0 1px var(--rule)}
-.stats{grid-column:1/-1;display:grid;gap:5px;border-top:1px solid var(--rule);padding-top:9px;margin-top:2px;font-size:13px}
-.stats .sh{display:flex;justify-content:space-between;gap:10px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
-.stats .sh span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:48%}
-.stats .sh span:first-child{color:var(--ink)}
+.st{font:700 11.5px var(--mono);padding:3px 9px;border-radius:5px;white-space:nowrap;background:rgba(255,255,255,.07);color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.st.live{background:var(--live);color:#fff}
+.st.live .ld{width:6px;height:6px;border-radius:50%;background:#fff}
+.st.ht{background:rgba(255,194,61,.16);color:var(--draw)}
+.st.ft{background:var(--ink);color:#06101c}
+
+.sb{display:grid;gap:6px}
+.row{display:grid;grid-template-columns:5px minmax(0,1fr) 46px;align-items:center;gap:10px}
+.row .kit{height:24px;border-radius:2px;background:rgba(255,255,255,.18)}
+.row.ours .kit{background:var(--team)}
+.row .nm{font:600 17px var(--body);font-stretch:85%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#c7d2e3}
+.row.ours .nm{font-weight:850;color:var(--ink)}
+.g{perspective:200px;display:block}
+.g span{display:block;text-align:center;font:900 28px/38px var(--body);font-stretch:75%;font-variant-numeric:tabular-nums;background:linear-gradient(180deg,#1d2c47 0 50%,#18253d 50% 100%);border-radius:6px;box-shadow:inset 0 0 0 1px var(--rule);transform-origin:50% 50%}
+.row.ours .g span{color:#fff}
+.row:not(.ours) .g span{color:#c7d2e3}
+.g:empty{display:none}
+
+/* Stats */
+.stats{display:grid;gap:7px;border-top:1px solid var(--rule);padding-top:10px;font-size:13px}
+.sh{display:flex;justify-content:space-between;gap:10px;font:800 10.5px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sh span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:48%}
+.sh span:first-child{color:var(--ink)}
 .poss{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font:700 12px var(--mono)}
-.pbar{height:8px;border-radius:99px;background:var(--rule);overflow:hidden;display:block}
-.pbar i{display:block;height:100%;background:var(--ink);border-radius:99px 0 0 99px;transition:width .8s ease}
+.pbar{position:relative;height:9px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;display:block}
+.pbar i{position:relative;display:block;height:100%;background:var(--team);border-radius:99px 0 0 99px;transition:width 1.1s cubic-bezier(.2,.8,.2,1);overflow:hidden}
+.pbar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);transform:translateX(-100%)}
 .sr{display:grid;grid-template-columns:5.2em minmax(0,1fr) 5.2em;align-items:baseline;gap:6px}
-.sr .a,.sr .b{white-space:nowrap}
 .sr .l{text-align:center;color:var(--muted);font-size:12px}
-.sr .a,.sr .b{font:700 13px var(--mono)} .sr .b{text-align:right}
-.sr .a{color:var(--ink)} .sr .b{color:var(--muted)}
-.sr small{font-weight:400;font-size:11px}
-.goals:empty{display:none}
-.fs{grid-column:1/-1;font-size:12.5px;color:var(--muted)}
+.sr .a,.sr .b{font:700 13px var(--mono);white-space:nowrap}
+.sr .b{text-align:right;color:var(--muted)}
+.sr small{font-weight:400;font-size:11px;opacity:.8}
+
+/* Timeline */
+.goals{display:flex;flex-wrap:wrap;gap:5px 6px}
+.ev{background:rgba(255,255,255,.06);border-radius:6px;padding:3px 8px;white-space:nowrap;font-size:12.5px;color:var(--muted)}
+.ev b{font:600 11px var(--mono);color:var(--muted);margin-right:2px}
+.ev.us{color:var(--ink);font-weight:700;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px var(--rule)}
+.ev.us.goal{background:rgba(255,212,71,.14);box-shadow:inset 0 0 0 1px rgba(255,212,71,.45)}
+.fs{font-size:12.5px;color:var(--muted)}
 .fs a,.foot a{color:var(--ink)}
-.goalflash{grid-column:1/-1;justify-self:start;font:800 13px var(--body);letter-spacing:.1em;color:#0d1b2e;background:var(--gold);padding:3px 10px;border-radius:6px}
-.foot{font-size:12.5px;color:var(--muted);display:grid;gap:6px}
+
+/* Goal takeover */
+.takeover{position:fixed;inset:0;z-index:50;display:grid;place-items:center;pointer-events:none;opacity:0;transition:opacity .25s}
+.takeover.show{opacity:1}
+.takeover::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,212,71,.95) 0 46px,rgba(255,190,20,.95) 46px 92px)}
+.takeover.against::before{background:repeating-linear-gradient(115deg,rgba(210,45,38,.95) 0 46px,rgba(170,25,20,.95) 46px 92px)}
+.tk-in{position:relative;text-align:center;padding:0 16px;color:#0a0f18;max-width:100%;overflow-wrap:anywhere}
+.takeover.against .tk-in{color:#fff}
+.tk-big{font:900 clamp(60px,21vw,150px)/.9 var(--body);font-stretch:62%;text-transform:uppercase;letter-spacing:.01em}
+.takeover.against .tk-big{font-size:clamp(48px,16vw,110px)}
+.tk-sub{font:900 19px/1.15 var(--body);font-stretch:75%;text-transform:uppercase;margin-top:10px}
+.tk-who{font:700 12px/1.4 var(--mono);margin-top:6px;opacity:.85}
+
+.foot{font-size:12.5px;color:var(--muted);display:grid;gap:8px}
 .foot p{margin:0}
-.foot a.btn{display:inline-block;font:700 14px var(--body);padding:10px 14px;border-radius:999px;background:var(--ink);color:var(--page);text-decoration:none}
+.foot a.btn{display:inline-block;font:800 14px var(--body);padding:11px 16px;border-radius:999px;background:var(--gold);color:#0a0f18;text-decoration:none}
 a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-.err{background:var(--lose-soft);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:13px}
+.err{background:rgba(255,90,78,.14);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:13px;box-shadow:inset 0 0 0 1px rgba(255,90,78,.4)}
+
 @media (prefers-reduced-motion:no-preference){
-  h1 .dot{animation:blink 1.4s ease-in-out infinite}
-  .st.live{animation:pulse 1.6s ease-out infinite}
-  .card.flash{animation:flash 1.2s ease-out 3}
-  .goalflash{animation:pop .5s cubic-bezier(.3,1.8,.5,1) both}
+  body::before{animation:beams 7s ease-in-out infinite alternate}
+  h1 .live i,.st.live .ld{animation:blink 1.1s ease-in-out infinite}
+  h1 .live{animation:ring 2s ease-out infinite}
+  .track{animation:scroll var(--dur,30s) linear infinite}
+  .lt.in .bulb{animation:glow 1.6s ease-in-out infinite}
+  .lt.post .bulb{animation:pop .5s cubic-bezier(.3,1.8,.5,1) both}
+  .hud.oncourse::after,.hud.landed::after{animation:sheen 3s linear infinite}
+  .intro .hud,.intro .ticker{animation:drop .6s cubic-bezier(.2,.9,.3,1.2) both}
+  .intro .lt{animation:pop .5s cubic-bezier(.3,1.8,.5,1) both;animation-delay:calc(var(--d) + .2s)}
+  .intro .card{animation:slide .7s cubic-bezier(.2,.9,.3,1.1) both;animation-delay:calc(var(--d) + .25s)}
+  .intro .ev{animation:pop .4s cubic-bezier(.3,1.8,.5,1) both;animation-delay:calc(var(--d) + .7s)}
+  .card.live.win,.card.live.lose,.card.live.draw{animation:breathe 2.6s ease-in-out infinite}
+  .card.shake{animation:shake .7s cubic-bezier(.36,.07,.19,.97) 2}
+  .card.flash::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 30% 50%,rgba(255,212,71,.35),transparent 70%);animation:fade 2.4s ease-out 3}
+  .g span.flip{animation:flip .7s cubic-bezier(.3,1.4,.5,1) both}
+  .card.live .pbar i::after{animation:sweep 2.8s ease-in-out infinite}
+  .takeover.show .tk-big{animation:slam .55s cubic-bezier(.2,1.6,.4,1) both}
+  .takeover.show .tk-sub{animation:rise .5s .25s ease-out both}
+  .takeover.show .tk-who{animation:rise .5s .4s ease-out both}
+  .takeover.show::before{animation:stripes .8s linear infinite}
+  @keyframes beams{from{opacity:.55;transform:rotate(-1.5deg)}to{opacity:1;transform:rotate(1.5deg)}}
   @keyframes blink{50%{opacity:.25}}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(210,59,48,.55)}100%{box-shadow:0 0 0 8px rgba(210,59,48,0)}}
-  @keyframes flash{0%{background:var(--gold)}100%{background:var(--sheet)}}
-  @keyframes pop{from{transform:scale(1.6)}to{transform:none}}
+  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(255,59,48,.6)}100%{box-shadow:0 0 0 9px rgba(255,59,48,0)}}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+  @keyframes glow{50%{filter:brightness(1.35);transform:scale(1.08)}}
+  @keyframes pop{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+  @keyframes sheen{from{background-position:120% 0}to{background-position:-120% 0}}
+  @keyframes drop{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
+  @keyframes slide{from{transform:translateX(-30px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+  @keyframes breathe{50%{filter:brightness(1.12)}}
+  @keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px) rotate(-.6deg)}40%,60%{transform:translateX(7px) rotate(.6deg)}}
+  @keyframes fade{from{opacity:1}to{opacity:0}}
+  @keyframes flip{0%{transform:rotateX(-100deg);filter:brightness(2)}100%{transform:none}}
+  @keyframes sweep{0%{transform:translateX(-100%)}60%,100%{transform:translateX(100%)}}
+  @keyframes slam{0%{transform:scale(3) rotate(-6deg);opacity:0}100%{transform:none;opacity:1}}
+  @keyframes rise{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+  @keyframes stripes{to{background-position:100px 0}}
 }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header><h1><span class="dot" aria-hidden="true"></span>Inbetweeneers Live</h1><span class="date" id="date"></span></header>
-  <section class="bar" aria-live="polite"><div class="big" id="summary">Loading scores…</div><div class="small"><span id="verdict" class="verdict"></span><span id="updated"></span></div></section>
+<div class="wrap intro" id="wrap">
+  <header>
+    <div class="brand"><span class="kicker">Inbetweeneers</span><h1>Matchday <span class="live"><i aria-hidden="true"></i>LIVE</span></h1></div>
+    <span class="date" id="date"></span>
+  </header>
+  <div class="ticker" aria-hidden="true"><div class="track" id="ticker"><span class="ti"><em>Loading scores…</em></span></div></div>
+  <section class="hud" id="hud" aria-live="polite">
+    <ul class="lights" id="lights" aria-label="Acca tracker"></ul>
+    <div class="big" id="summary">Loading scores…</div>
+    <div class="small"><span id="verdict" class="verdict"></span><span id="updated"></span></div>
+  </section>
   <ul class="cards" id="cards"></ul>
   <div class="foot">
     <p><a class="btn" id="accaLink" href="#">← Back to the acca table</a></p>
-    <p>Scores from ESPN, checked every 30 seconds while this page is open. Possession, shots, corners and cards update live too. Scottish leagues aren't in that feed. If the page has been in the background, pull down or reopen to refresh.</p>
+    <p>Scores and stats from ESPN, checked every 30 seconds while this page is open. Scottish leagues aren't in that feed. If the page has been in the background, pull down or reopen to refresh.</p>
   </div>
 </div>
+<div class="takeover" id="goal" hidden aria-live="assertive"></div>
 <script>
 (function(){
   const POLL_MS = 30000;
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-  let cfg = null, last = {}, lastOk = 0, flashUntil = {};
+  const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let cfg = null, lastOk = 0, prev = {}, possPrev = {}, flashUntil = {}, firstPaint = true, tickerSig = "", koAt = 0;
+  const queue = []; let showing = false;
 
   function ukDate(iso){ const d = new Date(iso+"T12:00:00"); return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
   function ukTime(d){ return d.toLocaleTimeString("en-GB",{hour:"numeric",minute:"2-digit",hour12:true,timeZone:"Europe/London"}).replace(":00","").replace(/\s/g,"").toLowerCase(); }
+
+  // Team colour that shows up on a dark background.
+  function teamColour(t){
+    const ok = x => /^[0-9a-f]{6}$/i.test(x||"");
+    const lum = x => { const n = parseInt(x,16); return (0.299*(n>>16) + 0.587*(n>>8&255) + 0.114*(n&255))/255; };
+    for (const c of [t.color, t.alternateColor]) if (ok(c) && lum(c) > 0.3 && lum(c) < 0.93) return "#"+c;
+    if (ok(t.color)) return `color-mix(in srgb, #${t.color} 50%, #ffffff)`;
+    return "";
+  }
 
   async function loadConfig(){
     const r = await fetch("picks.json?ts="+Date.now(), {cache:"no-store"});
@@ -127,7 +247,7 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     const c = ev.competitions[0];
     const ours = c.competitors.find(x => x.team.displayName === p.espnTeam) || c.competitors.find(x => x.team.displayName.includes(p.team.split(" ")[0]));
     const them = c.competitors.find(x => x !== ours);
-    const st = c.status.type;
+    const status = c.status || ev.status, st = status.type;
     // Timeline: goals and cards in minute order.
     const goals = (c.details||[]).filter(d => d.scoringPlay || d.yellowCard || d.redCard).map(d => ({
       kind: d.scoringPlay ? "goal" : d.redCard ? "red" : "yellow",
@@ -146,88 +266,193 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
       onT: [sv(ours,"shotsOnTarget"), sv(them,"shotsOnTarget")],
       corners: [sv(ours,"wonCorners"), sv(them,"wonCorners")],
       yellow: [cardCount(true,"yellow"), cardCount(false,"yellow")],
-      red: [cardCount(true,"red"), cardCount(false,"red")],
-      colour: ours && /^[0-9a-f]{6}$/i.test(ours.team.color||"") ? "#"+ours.team.color : ""
+      red: [cardCount(true,"red"), cardCount(false,"red")]
     };
     return {
       state: st.state, // pre | in | post
       detail: st.shortDetail || st.description || "",
       completed: !!st.completed,
+      clockSecs: +status.clock || 0, period: +status.period || 0,
       usName: ours ? ours.team.displayName : p.team, themName: them ? them.team.displayName : "",
+      usAbbr: ours ? ours.team.abbreviation || ours.team.shortDisplayName : p.team,
+      themAbbr: them ? them.team.abbreviation || them.team.shortDisplayName : "",
       us: ours ? +ours.score : 0, them: them ? +them.score : 0,
       home: ours ? ours.homeAway === "home" : true,
+      colour: ours ? teamColour(ours.team) : "",
       start: new Date(ev.date), goals, stats
     };
   }
 
+  const isHT = m => /HT|half/i.test(m.detail);
   function statusChip(m){
     if (!m) return `<span class="st">–</span>`;
     if (m.state === "pre") return `<span class="st">${esc(ukTime(m.start))}</span>`;
     if (m.state === "post") return `<span class="st ft">FT</span>`;
-    if (/HT|half/i.test(m.detail)) return `<span class="st ht">HT</span>`;
-    return `<span class="st live">● ${esc(m.detail)}</span>`;
+    if (isHT(m)) return `<span class="st ht">HT</span>`;
+    const fixed = /\+/.test(m.detail) || !m.clockSecs ? 1 : 0;
+    return `<span class="st live"><i class="ld" aria-hidden="true"></i><span class="clk" data-secs="${m.clockSecs}" data-period="${m.period}" data-fixed="${fixed}">${esc(m.detail)}</span></span>`;
   }
   const moodOf = m => !m || m.state === "pre" ? "" : m.us > m.them ? "win" : m.us === m.them ? "draw" : "lose";
-  const moodText = (mood, m) => !mood ? "" : m.state === "post" ? (mood==="win"?"Won":"Lost") : (mood==="win"?"Winning":mood==="draw"?"Drawing":"Losing");
+  const moodText = (mood, m) => !mood ? "" : m.state === "post" ? (mood==="win"?"Won":mood==="draw"?"Drew":"Lost") : (mood==="win"?"Winning":mood==="draw"?"Drawing":"Losing");
+  const homeScore = m => `${m.home?m.us:m.them}-${m.home?m.them:m.us}`;
+  const cu = n => n == null ? null : `<span class="cu" data-n="${n}">${n}</span>`;
+
+  function cardHtml(p, i, m, ch){
+    const d = `--d:${i*110}ms`;
+    if (!p.event){
+      return `<li class="card" style="${d}"><div class="ch"><span class="who">${esc(p.who)}</span><span class="odds">${esc(p.odds||"")}</span><span class="sp"></span><span class="st">${esc(p.ko||"")}</span></div>
+        <div class="sb"><div class="row ours"><span class="kit"></span><span class="nm">${esc(p.team)}</span><span class="g"></span></div>
+        <div class="row"><span class="kit"></span><span class="nm">${p.away?"at ":"v "}${esc(p.opponent||"")}</span><span class="g"></span></div></div>
+        ${p.fs?`<div class="fs">Not in the live feed. <a href="${esc(p.fs)}" target="_blank" rel="noopener">Live score on Flashscore ↗</a></div>`:""}</li>`;
+    }
+    const mood = moodOf(m), key = p.event, now = Date.now();
+    const flashing = flashUntil[key] && flashUntil[key] > now;
+    const played = m && m.state !== "pre";
+    const homeLine = m ? (m.home ? [m.usName,m.us,true] : [m.themName,m.them,false]) : [p.team,"",true];
+    const awayLine = m ? (m.home ? [m.themName,m.them,false] : [m.usName,m.us,true]) : ["","",false];
+    const homeFlip = m && (m.home ? ch.usUp : ch.themUp), awayFlip = m && (m.home ? ch.themUp : ch.usUp);
+    const digit = (v, flip) => played ? `<span class="${flip?"flip":""}">${v}</span>` : "";
+    const icon = {goal:"⚽", yellow:"🟨", red:"🟥"};
+    const gl = m && m.goals.length ? m.goals.map(g => `<span class="ev${g.ours?" us":""} ${g.kind}"><b>${esc(g.clock)}</b> ${icon[g.kind]} ${esc(g.name)}${g.pen?" (pen)":""}${g.og?" (og)":""}</span>`).join("") : "";
+    let statsHtml = "";
+    if (played){
+      const sx = m.stats, p0 = sx.poss[0], p1 = sx.poss[1];
+      const pair = (label, a, b) => a == null || b == null ? "" : `<div class="sr"><span class="a">${a}</span><span class="l">${label}</span><span class="b">${b}</span></div>`;
+      let possHtml = "";
+      if (p0 != null && p1 != null && p0 + p1 > 0){
+        const w = Math.max(0, Math.min(100, p0/(p0+p1)*100));
+        possHtml = `<div class="poss" role="img" aria-label="Possession ${Math.round(p0)}% to ${Math.round(p1)}%"><span>${Math.round(p0)}%</span><span class="pbar"><i data-k="${esc(key)}" data-w="${w.toFixed(1)}" style="width:${(possPrev[key] ?? 0).toFixed(1)}%"></i></span><span>${Math.round(p1)}%</span></div>`;
+      }
+      const shots = k => sx.shots[k] == null ? null : `${cu(sx.shots[k])} <small>(${sx.onT[k] ?? 0})</small>`;
+      const rows = pair("Shots (on target)", shots(0), shots(1)) + pair("Corners", cu(sx.corners[0]), cu(sx.corners[1]))
+        + pair("🟨 Yellow", sx.yellow[0], sx.yellow[1]) + (sx.red[0] || sx.red[1] ? pair("🟥 Red", sx.red[0], sx.red[1]) : "");
+      if (possHtml || rows) statsHtml = `<div class="stats"><div class="sh"><span>${esc(m.usName)}</span><span>${esc(m.themName)}</span></div>${possHtml}${rows}</div>`;
+    }
+    const cls = ["card", mood, m && m.state === "in" ? "live" : "", flashing ? "flash" : "", ch.usUp || ch.themUp ? "shake" : ""].filter(Boolean).join(" ");
+    const team = m && m.colour ? `--team:${m.colour};` : "";
+    return `<li class="${cls}" style="${team}${d}">
+      <div class="ch"><span class="who">${esc(p.who)}</span><span class="odds">${esc(p.odds||"")}</span><span class="sp"></span><span class="mood ${mood}">${moodText(mood,m)}</span>${statusChip(m)}</div>
+      <div class="sb">
+        <div class="row${homeLine[2]?" ours":""}"><span class="kit"></span><span class="nm">${esc(homeLine[0])}</span><span class="g">${digit(homeLine[1], homeFlip)}</span></div>
+        <div class="row${awayLine[2]?" ours":""}"><span class="kit"></span><span class="nm">${esc(awayLine[0])}</span><span class="g">${digit(awayLine[1], awayFlip)}</span></div>
+      </div>
+      ${statsHtml}
+      ${gl?`<div class="goals">${gl}</div>`:""}
+      ${p.fs?`<div class="fs"><a href="${esc(p.fs)}" target="_blank" rel="noopener">Flashscore ↗</a></div>`:""}
+    </li>`;
+  }
+
+  function renderTicker(results){
+    const items = cfg.picks.map((p,i) => {
+      const m = results[i];
+      if (!m) return `<span class="ti"><b>${esc(p.who)}</b><span class="sc">${esc(p.team)}</span><em>${esc(p.ko||"")}</em></span>`;
+      const h = m.home ? m.usAbbr : m.themAbbr, a = m.home ? m.themAbbr : m.usAbbr;
+      const sc = m.state === "pre" ? `${h} v ${a}` : `${h} ${homeScore(m)} ${a}`;
+      const clk = m.state === "pre" ? ukTime(m.start) : m.state === "post" ? "FT" : isHT(m) ? "HT" : m.detail;
+      return `<span class="ti ${moodOf(m)}"><b>${esc(p.who)}</b><span class="sc">${esc(sc)}</span><em>${esc(clk)}</em></span>`;
+    }).join(`<span class="sep">◆</span>`);
+    if (items === tickerSig) return;
+    tickerSig = items;
+    const t = $("ticker");
+    t.innerHTML = items + `<span class="sep">◆</span>` + items + `<span class="sep">◆</span>`;
+    t.style.setProperty("--dur", Math.max(18, cfg.picks.length * 6) + "s");
+  }
 
   function render(results){
-    const now = Date.now();
     let started=0, winning=0, finished=0, lostFinal=false;
-    $("cards").innerHTML = cfg.picks.map((p, i) => {
-      const m = results[i];
-      if (!p.event){
-        return `<li class="card"><div class="teams"><div class="who">${esc(p.who)}<span class="odds">${esc(p.odds||"")}</span></div>
-          <div class="line ours"><span class="nm">${esc(p.team)}</span></div><div class="line"><span class="nm">${p.away?"at ":"v "}${esc(p.opponent||"")}</span></div></div>
-          <div class="side"><span class="st">${esc(p.ko||"")}</span></div>
-          <div class="fs">Not in the live feed. <a href="${esc(p.fs)}" target="_blank" rel="noopener">Live score on Flashscore ↗</a></div></li>`;
-      }
+    const goalsNow = [];
+    const changes = cfg.picks.map((p, i) => {
+      const m = results[i], key = p.event, pv = prev[key];
+      const ch = {usUp:false, themUp:false};
+      if (!m) return ch;
+      if (pv && m.state !== "pre"){ ch.usUp = m.us > pv.us; ch.themUp = m.them > pv.them; }
+      prev[key] = {us:m.us, them:m.them};
+      if (ch.usUp || ch.themUp){ flashUntil[key] = Date.now() + 20000; goalsNow.push({p, m, ours: ch.usUp}); }
       const mood = moodOf(m);
-      if (m && m.state !== "pre") { started++; if (mood==="win") winning++; }
-      if (m && m.state === "post") { finished++; if (mood!=="win") lostFinal = true; }
-      const key = p.event, sig = m ? m.us+"-"+m.them : "";
-      if (last[key] !== undefined && last[key] !== sig && m && m.state !== "pre") flashUntil[key] = now + 20000;
-      last[key] = sig;
-      const flashing = flashUntil[key] && flashUntil[key] > now;
-      const homeLine = m ? (m.home ? [m.usName,m.us,true] : [m.themName,m.them,false]) : [p.team,"",true];
-      const awayLine = m ? (m.home ? [m.themName,m.them,false] : [m.usName,m.us,true]) : ["","",false];
-      const icon = {goal:"⚽", yellow:"🟨", red:"🟥"};
-      const gl = m && m.goals.length ? m.goals.map(g => `<span class="ev${g.ours?" us":""}"><b>${esc(g.clock)}</b> ${icon[g.kind]} ${esc(g.name)}${g.pen?" (pen)":""}${g.og?" (og)":""}</span>`).join("") : "";
-      const sx = m && m.state !== "pre" ? m.stats : null;
-      const pair = (label, a, b) => a == null || b == null ? "" : `<div class="sr"><span class="a">${a}</span><span class="l">${label}</span><span class="b">${b}</span></div>`;
-      let statsHtml = "";
-      if (sx){
-        const p0 = sx.poss[0], p1 = sx.poss[1];
-        const possHtml = p0 == null || p1 == null || p0 + p1 === 0 ? "" :
-          `<div class="poss" role="img" aria-label="Possession ${p0}% to ${p1}%"><span class="pa">${Math.round(p0)}%</span><span class="pbar"><i style="width:${Math.max(0,Math.min(100,p0/(p0+p1)*100)).toFixed(1)}%${sx.colour?";background:"+sx.colour:""}"></i></span><span class="pb">${Math.round(p1)}%</span></div>`;
-        const shotsA = sx.shots[0] == null ? null : `${sx.shots[0]} <small>(${sx.onT[0] ?? 0})</small>`;
-        const shotsB = sx.shots[1] == null ? null : `${sx.shots[1]} <small>(${sx.onT[1] ?? 0})</small>`;
-        const rows = pair("Shots (on target)", shotsA, shotsB) + pair("Corners", sx.corners[0], sx.corners[1]) + pair("🟨 Yellow", sx.yellow[0], sx.yellow[1]) + (sx.red[0] || sx.red[1] ? pair("🟥 Red", sx.red[0], sx.red[1]) : "");
-        if (possHtml || rows) statsHtml = `<div class="stats"><div class="sh"><span>${esc(m.usName)}</span><span>${esc(m.themName)}</span></div>${possHtml}${rows}</div>`;
-      }
-      return `<li class="card ${mood}${flashing?" flash":""}">
-        ${flashing?`<span class="goalflash">GOAL!</span>`:""}
-        <div class="teams"><div class="who">${esc(p.who)}<span class="odds">${esc(p.odds||"")}</span></div>
-          <div class="line${homeLine[2]?" ours":""}"><span class="nm">${esc(homeLine[0])}</span><span class="g">${m&&m.state!=="pre"?homeLine[1]:""}</span></div>
-          <div class="line${awayLine[2]?" ours":""}"><span class="nm">${esc(awayLine[0])}</span><span class="g">${m&&m.state!=="pre"?awayLine[1]:""}</span></div></div>
-        <div class="side">${statusChip(m)}<span class="mood ${mood}">${moodText(mood,m)}</span></div>
-        ${statsHtml}
-        ${gl?`<div class="goals">${gl}</div>`:""}
-        ${p.fs?`<div class="fs"><a href="${esc(p.fs)}" target="_blank" rel="noopener">Flashscore ↗</a></div>`:""}
-      </li>`;
+      if (m.state !== "pre") { started++; if (mood==="win") winning++; }
+      if (m.state === "post") { finished++; if (mood!=="win") lostFinal = true; }
+      return ch;
+    });
+    $("cards").innerHTML = cfg.picks.map((p, i) => cardHtml(p, i, results[i], changes[i])).join("");
+
+    // Possession bars glide from their last value to the new one.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.querySelectorAll(".pbar i[data-w]").forEach(el => { el.style.width = el.dataset.w + "%"; possPrev[el.dataset.k] = +el.dataset.w; });
+    }));
+    if (firstPaint && !reduce) countUp();
+
+    $("lights").innerHTML = cfg.picks.map((p, i) => {
+      const m = results[i], mood = moodOf(m), st = m ? m.state : "off";
+      const mark = m && m.state === "post" ? (mood === "win" ? "✓" : "✕") : "";
+      return `<li class="lt ${mood} ${st}" style="--d:${i*110}ms" title="${esc(p.who)}: ${esc(p.team)}"><span class="bulb">${mark}</span><span class="nm">${esc(p.who)}</span></li>`;
     }).join("");
+    renderTicker(results);
+
     const tracked = cfg.picks.filter(p=>p.event).length;
+    const extra = cfg.picks.filter(p=>!p.event).map(p=>p.team);
     let summary, verdict = "", vclass = "";
-    if (!started) summary = `Kick-off ${results.find(Boolean) ? ukTime(results.find(Boolean).start) : ""} · ${tracked} games tracked live`;
-    else if (finished === tracked) summary = `Full time · ${winning} of ${tracked} won`;
-    else summary = `${winning} of ${started} winning right now${finished?` · ${finished} finished`:""}`;
+    koAt = 0;
+    if (!started){
+      const first = results.filter(Boolean).map(m=>m.start.getTime()).sort((a,b)=>a-b)[0];
+      koAt = first || 0;
+      summary = `Kick-off <span class="n">${first ? esc(ukTime(new Date(first))) : ""}</span> <span id="cd"></span>`;
+    } else if (finished === tracked) summary = `Full time · <span class="n">${winning} of ${tracked}</span> won`;
+    else summary = `<span class="n">${winning} of ${started}</span> winning right now${finished?` · ${finished} finished`:""}`;
+    const allWin = started && cfg.picks.every((p,i)=>!p.event || moodOf(results[i])==="win");
     if (lostFinal) { verdict = "Acca's gone: one pick has lost"; vclass = "lose"; }
     else if (started) {
-      const allWin = cfg.picks.every((p,i)=>!p.event || moodOf(results[i])==="win");
-      verdict = allWin ? "If it ended now, the acca lands (plus Hamilton)" : "If it ended now, the acca loses";
+      verdict = allWin ? `If it ended now, the acca lands${extra.length?` (plus ${extra.join(", ")})`:""} 🎉` : "If it ended now, the acca loses";
       vclass = allWin ? "win" : "lose";
     }
-    $("summary").textContent = summary;
+    $("hud").className = "hud" + (allWin && finished === tracked && tracked ? " landed" : allWin ? " oncourse" : "");
+    $("summary").innerHTML = summary;
     $("verdict").textContent = verdict; $("verdict").className = "verdict " + vclass;
+    tickClocks();
+
+    goalsNow.forEach(g => queue.push(g));
+    if (!firstPaint) nextTakeover(); else queue.length = 0;
+    if (firstPaint){ firstPaint = false; setTimeout(() => $("wrap").classList.remove("intro"), 2600); }
+  }
+
+  function countUp(){
+    document.querySelectorAll(".cu").forEach(el => {
+      const n = +el.dataset.n; if (!n) return;
+      const t0 = performance.now(), dur = 1000;
+      el.textContent = "0";
+      const step = t => { const k = Math.min(1, (t - t0) / dur); el.textContent = Math.round(n * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); };
+      setTimeout(() => requestAnimationFrame(step), 500);
+    });
+  }
+
+  function nextTakeover(){
+    if (showing || !queue.length) return;
+    const e = queue.shift(), el = $("goal"), m = e.m;
+    const g = [...m.goals].reverse().find(x => x.kind === "goal" && x.ours === e.ours);
+    el.className = "takeover " + (e.ours ? "ours" : "against");
+    el.innerHTML = `<div class="tk-in"><div class="tk-big">${e.ours ? "Goal!" : "Goal"}</div>
+      <div class="tk-sub">${esc(e.ours ? m.usName : m.themName)}${g && g.name ? " · " + esc(g.name) + " " + esc(g.clock) : ""}</div>
+      <div class="tk-who">${esc(e.p.who)}${/s$/i.test(e.p.who)?"'":"'s"} pick ·${esc(m.home ? m.usAbbr : m.themAbbr)} ${homeScore(m)} ${esc(m.home ? m.themAbbr : m.usAbbr)}</div></div>`;
+    showing = true; el.hidden = false; void el.offsetWidth; el.classList.add("show");
+    if (e.ours && navigator.vibrate) { try { navigator.vibrate([120,60,120]); } catch(_){} }
+    setTimeout(() => { el.classList.remove("show"); setTimeout(() => { el.hidden = true; showing = false; nextTakeover(); }, 300); }, 3400);
+  }
+
+  // Between updates: count the match clock up and the kick-off countdown down.
+  function tickClocks(){
+    if (lastOk) $("updated").textContent = `Updated ${Math.round((Date.now()-lastOk)/1000)}s ago`;
+    const gone = lastOk ? (Date.now() - lastOk) / 1000 : 0;
+    document.querySelectorAll(".clk").forEach(c => {
+      if (c.dataset.fixed === "1") return;
+      const cap = +c.dataset.period === 1 ? 45 : 90;
+      c.textContent = Math.min(Math.floor((+c.dataset.secs + gone) / 60) + 1, cap) + "'";
+    });
+    const cd = $("cd");
+    if (cd && koAt){
+      const s = Math.round((koAt - Date.now()) / 1000);
+      if (s <= 0) cd.textContent = "· any moment";
+      else { const h = Math.floor(s/3600), mm = Math.floor(s%3600/60), ss = s%60;
+        cd.textContent = "· in " + (h ? `${h}h ${String(mm).padStart(2,"0")}m` : `${mm}:${String(ss).padStart(2,"0")}`); }
+    }
   }
 
   async function tick(){
@@ -239,13 +464,14 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
         const ev = (boards[p.league].events||[]).find(e => String(e.id) === String(p.event));
         return ev ? readEvent(ev, p) : null;
       });
-      render(results); lastOk = Date.now();
-      const err = document.getElementById("err"); if (err) err.remove();
+      lastOk = Date.now();
+      render(results);
+      const err = $("err"); if (err) err.remove();
     } catch(e){
-      if (!document.getElementById("err")) $("cards").insertAdjacentHTML("beforebegin", `<div class="err" id="err">Couldn't reach the live scores just now. Trying again in 30 seconds.</div>`);
+      if (!$("err")) $("cards").insertAdjacentHTML("beforebegin", `<div class="err" id="err">Couldn't reach the live scores just now. Trying again in 30 seconds.</div>`);
     }
   }
-  setInterval(() => { if (lastOk) $("updated").textContent = `Updated ${Math.round((Date.now()-lastOk)/1000)}s ago`; }, 1000);
+  setInterval(tickClocks, 1000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden && cfg) tick(); });
 
   loadConfig().then(() => { tick(); setInterval(tick, POLL_MS); })
