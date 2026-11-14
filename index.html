@@ -157,6 +157,36 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
   body.side-open .scrim{opacity:1;pointer-events:auto}
 }
 
+/* Faces */
+.face{display:block;border-radius:50%;object-fit:cover;background:#ccd3e6;flex:none}
+.bulb{width:38px!important;height:38px!important;padding:3px;display:block}
+.bulb .face{width:100%;height:100%}
+.lt.post.win .bulb{background:var(--gold);box-shadow:0 0 0 4px rgba(255,212,71,.3)}
+.lt.post.lose .face,.lt.post.draw .face{filter:grayscale(1) contrast(.9)}
+.gh .face{width:22px;height:22px;box-shadow:0 0 0 2px rgba(255,255,255,.35)}
+.game.win .gh .face{box-shadow:0 0 0 2px var(--win)} .game.lose .gh .face{box-shadow:0 0 0 2px var(--lose)} .game.draw .gh .face{box-shadow:0 0 0 2px var(--draw)}
+.lr .face{width:28px;height:28px}
+.lr.final .face{filter:grayscale(1)}
+.ti .face{display:inline-block;width:16px;height:16px;vertical-align:-3px;margin-right:4px}
+/* Head pop-up on goals */
+.pop{position:fixed;z-index:40;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(var(--bottom,90px) - 6px);display:flex;align-items:flex-end;gap:8px;pointer-events:none;transform:translateY(140%);transition:transform .5s cubic-bezier(.3,1.5,.5,1)}
+.pop.show{transform:none}
+.pop .face{width:84px;height:84px;box-shadow:0 0 0 4px #fff,0 12px 30px -8px rgba(0,0,0,.7)}
+.pop .bub{position:relative;margin-bottom:56px;background:#fff;color:var(--ink);font:900 20px var(--body);font-stretch:80%;text-transform:uppercase;padding:8px 14px;border-radius:14px;white-space:nowrap;box-shadow:0 10px 24px -10px rgba(0,0,0,.6)}
+.pop .bub::before{content:"";position:absolute;left:-7px;bottom:10px;border:8px solid transparent;border-right-color:#fff;border-left:0}
+.pop.ours .bub{background:var(--gold)} .pop.ours .bub::before{border-right-color:var(--gold)}
+/* Full-time banner ("Cheers, X") and face rain */
+.ftban{position:fixed;z-index:45;left:50%;top:22%;transform:translate(-50%,-30px) scale(.9);opacity:0;pointer-events:none;background:#fff;color:var(--ink);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 24px 60px -16px rgba(0,0,0,.7);transition:opacity .4s,transform .5s cubic-bezier(.3,1.5,.5,1);max-width:calc(100vw - 32px)}
+.ftban.show{opacity:1;transform:translate(-50%,0) scale(1)}
+.ftban .faces{display:flex}
+.ftban .face{width:60px;height:60px;box-shadow:0 0 0 3px #fff;filter:grayscale(1)}
+.ftban .face + .face{margin-left:-14px}
+.ftban b{display:block;font:900 22px var(--body);font-stretch:80%;text-transform:uppercase}
+.ftban span{font-size:13px;color:var(--grey)}
+.ftban.won .face{filter:none}
+.rain{position:fixed;inset:0;z-index:44;pointer-events:none;overflow:hidden}
+.rain .face{position:absolute;top:-80px;width:56px;height:56px;box-shadow:0 0 0 3px var(--gold)}
+
 /* Bottom strip */
 .bottom{position:fixed;left:0;right:0;bottom:0;z-index:20;padding-bottom:env(safe-area-inset-bottom,0px);background:#fff;box-shadow:0 -8px 24px -12px rgba(0,0,0,.55)}
 .goalrows{list-style:none;margin:0;padding:3px 0 1px}
@@ -175,7 +205,23 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
 
 @media (prefers-reduced-motion:no-preference){
   .badge .ld,.st.live .ld{animation:blink 1.2s ease-in-out infinite}
-  .lt.in .bulb{animation:breathe 2.4s ease-in-out infinite}
+  .lt.in.win .bulb{animation:bob 1.8s ease-in-out infinite}
+  .lt.in.lose .bulb{animation:nervous 2.4s ease-in-out infinite}
+  .lt.in.draw .bulb{animation:breathe 2.6s ease-in-out infinite}
+  .lt.post.win .bulb{animation:bob 1.4s ease-in-out 3}
+  .game.live.win .gh .face{animation:bob 1.8s ease-in-out infinite}
+  .game.live.lose .gh .face{animation:nervous 2.4s ease-in-out infinite}
+  .lr:first-child .face{animation:wobble 2.2s ease-in-out infinite}
+  .lr:last-child .face{animation:bob 2.6s ease-in-out infinite}
+  .pop.show .face{animation:wobble .5s .45s ease-in-out 3}
+  .pop.against.show .face{animation:nervous .8s .45s ease-in-out 3}
+  .pop.show .bub{animation:popIn .4s .35s cubic-bezier(.3,1.8,.5,1) both}
+  .ftban.show .face{animation:wobble .6s .4s ease-in-out 4}
+  .rain .face{animation:fall var(--t,3.4s) linear var(--dl,0s) forwards}
+  @keyframes nervous{0%,60%,100%{transform:none}65%,75%,85%{transform:translateX(-2px) rotate(-5deg)}70%,80%,90%{transform:translateX(2px) rotate(5deg)}}
+  @keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-9deg)}75%{transform:rotate(9deg)}}
+  @keyframes popIn{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+  @keyframes fall{to{transform:translateY(calc(100vh + 160px)) rotate(var(--r,360deg))}}
   .track{animation:scroll var(--dur,40s) linear infinite}
   .ticker.hold .track{animation-play-state:paused}
   .intro .reveal{animation:fadeUp .6s var(--ease) both;animation-delay:var(--d,0ms)}
@@ -193,7 +239,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
   @keyframes sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
   @keyframes bob{50%{transform:translateY(-3px)}}
   @keyframes blink{50%{opacity:.25}}
-  @keyframes breathe{50%{transform:scale(1.18)}}
+  @keyframes breathe{50%{transform:scale(1.07)}}
   @keyframes scroll{to{transform:translateX(-50%)}}
   @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   @keyframes rollOut{to{transform:translateY(-100%);opacity:0}}
@@ -227,6 +273,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
 </div>
 <button class="sidetab" id="sidetab" type="button" hidden aria-controls="side" aria-expanded="false"><span class="dot" aria-hidden="true"></span>Table</button>
 <div class="scrim" id="scrim" hidden></div>
+<div class="pop" id="pop" aria-live="polite"></div>
+<div class="ftban" id="ftban" aria-live="polite"></div>
 <div class="bottom" id="bottom">
   <ul class="goalrows" id="goalrows" aria-label="Latest goals"></ul>
   <div class="ticker" id="tickerBox" aria-hidden="true"><div class="track" id="ticker"><span class="ti">Loading scores…</span></div></div>
@@ -247,6 +295,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
   function ukTime(d){ return d.toLocaleTimeString("en-GB",{hour:"numeric",minute:"2-digit",hour12:true,timeZone:"Europe/London"}).replace(":00","").replace(/\s/g,"").toLowerCase(); }
   function nowClock(){ return new Date().toLocaleTimeString("en-GB",{hour:"numeric",minute:"2-digit",hour12:true,timeZone:"Europe/London"}).replace(/\s?([ap])\.?m\.?/i," $1m").toLowerCase(); }
   const setHTML = (el, html) => { if (el && el.innerHTML !== html) el.innerHTML = html; };
+  // Each person's face lives in faces/<nickname>.jpg
+  const face = (who, cls) => `<img class="face${cls?" "+cls:""}" src="faces/${encodeURIComponent(who)}.jpg" alt="" onerror="this.style.visibility='hidden'">`;
 
   // Team colour that shows up on the blue panel.
   function teamColour(t){
@@ -280,12 +330,12 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
       const head = `<div class="league">${esc(LEAGUES[k] || (k === "other" ? "Other leagues" : k))}</div>`;
       return head + `<ul class="games">` + groups[k].map(i => {
         const p = cfg.picks[i], d = `--d:${160 + (n++)*90}ms`;
-        if (!p.event) return `<li class="game reveal" style="${d}"><div class="gh"><span class="who">${esc(p.who)}</span><span class="odds">${esc(p.odds||"")}</span><span class="sp"></span><span class="st">${esc(p.ko||"")}</span></div>
+        if (!p.event) return `<li class="game reveal" style="${d}"><div class="gh">${face(p.who)}<span class="who">${esc(p.who)}</span><span class="odds">${esc(p.odds||"")}</span><span class="sp"></span><span class="st">${esc(p.ko||"")}</span></div>
           <div class="row ours"><span class="nm">${esc(p.team)}</span><span class="box"></span></div>
           <div class="row"><span class="nm">${p.away?"at ":"v "}${esc(p.opponent||"")}</span><span class="box"></span></div>
           ${p.fs?`<div class="fs">Not in the live feed. <a href="${esc(p.fs)}" target="_blank" rel="noopener">Flashscore ↗</a></div>`:""}</li>`;
         return `<li class="game reveal" data-k="${esc(p.event)}" style="${d}">
-          <div class="gh"><span class="who">${esc(p.who)}</span><span class="odds">${esc(p.odds||"")}</span><span class="sp"></span><span class="stw"><span class="st">–</span></span></div>
+          <div class="gh">${face(p.who)}<span class="who">${esc(p.who)}</span><span class="odds">${esc(p.odds||"")}</span><span class="sp"></span><span class="stw"><span class="st">–</span></span></div>
           <div class="row"><span class="nm">${esc(p.team)}</span><span class="box"></span></div><div class="scorers"></div>
           <div class="row"><span class="nm"></span><span class="box"></span></div><div class="scorers"></div>
           <button class="toggle" type="button" hidden aria-expanded="false">Stats</button>
@@ -303,7 +353,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
       G[li.dataset.k] = { li, stw: li.querySelector(".stw"), rows, nm: [...rows].map(r => r.querySelector(".nm")), box: [...rows].map(r => r.querySelector(".box")),
         sc, toggle: li.querySelector(".toggle"), sh, pa: ps[0], pb: ps[2], bar: li.querySelector(".pbar i"), poss: li.querySelector(".poss"), srs: li.querySelector(".srs"), evs: li.querySelector(".evs") };
     });
-    $("lights").innerHTML = cfg.picks.map((p, i) => `<li class="lt" title="${esc(p.who)}: ${esc(p.team)}"><span class="bulb"></span><span class="nm">${esc(p.who)}</span></li>`).join("");
+    $("lights").innerHTML = cfg.picks.map((p, i) => `<li class="lt" title="${esc(p.who)}: ${esc(p.team)}"><span class="bulb">${face(p.who)}</span><span class="nm">${esc(p.who)}</span></li>`).join("");
     buildSide();
   }
 
@@ -324,7 +374,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
     if (!s || !Object.keys(s).length) return;
     $("side").hidden = false; $("sidetab").hidden = false; $("scrim").hidden = false;
     if (cfg.season.note) $("sideSub").textContent = cfg.season.note + " · live today";
-    $("lost").innerHTML = Object.keys(s).map(who => `<li class="lr" data-who="${esc(who)}"><span class="rk"></span><span class="nm"><span>${esc(who)}</span><span class="ic"></span></span><span class="plus">+1</span><span class="ct">${+s[who]||0}</span></li>`).join("");
+    $("lost").innerHTML = Object.keys(s).map(who => `<li class="lr" data-who="${esc(who)}"><span class="rk"></span><span class="nm">${face(who)}<span>${esc(who)}</span><span class="ic"></span></span><span class="plus">+1</span><span class="ct">${+s[who]||0}</span></li>`).join("");
     $("lost").querySelectorAll(".lr").forEach(li => { sideRows[li.dataset.who] = li; });
     updateSide([]);
   }
@@ -501,7 +551,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
     all.forEach(x => seenGoals.add(x.id));
 
     const items = cfg.picks.map((p, i) => {
-      const m = results[i], who = `<span class="who">${esc(p.who)}</span>`;
+      const m = results[i], who = `<span class="who">${face(p.who)}${esc(p.who)}</span>`;
       if (!m) return `<span class="ti">${who}${esc(p.team)} ${p.away?"at":"v"} ${esc(p.opponent||"")} ${esc(p.ko||"")}</span>`;
       const hn = m.home ? m.usName : m.themName, an = m.home ? m.themName : m.usName;
       if (m.state === "pre") return `<span class="ti">${who}${esc(hn)} v ${esc(an)} ${esc(ukTime(m.start))}</span>`;
@@ -521,6 +571,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
 
   function render(results){
     let started=0, winning=0, finished=0, lostFinal=false, ourGoal=false;
+    const pops = [], losers = [];
     cfg.picks.forEach((p, i) => {
       const m = results[i], key = p.event, pv = prev[key];
       const ch = {usUp:false, themUp:false};
@@ -528,9 +579,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
         if (pv && m.state !== "pre"){ ch.usUp = m.us > pv.us; ch.themUp = m.them > pv.them; }
         prev[key] = {us:m.us, them:m.them};
         if (ch.usUp) ourGoal = true;
+        if (!firstPaint && (ch.usUp || ch.themUp)) pops.push({who: p.who, ours: ch.usUp});
         const mood = moodOf(m);
         if (m.state !== "pre") { started++; if (mood==="win") winning++; }
-        if (m.state === "post") { finished++; if (mood!=="win") lostFinal = true; }
+        if (m.state === "post") { finished++; if (mood!=="win") { lostFinal = true; losers.push(p.who); } }
       }
       if (key) updateGame(key, m, ch);
     });
@@ -560,8 +612,42 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
     if (voids.length) verdict += `${verdict ? " · " : ""}${voids.join(", ")} void`;
     $("hud").classList.toggle("oncourse", !!allWin && !lostFinal);
     setHTML($("summary"), summary + (verdict ? ` · <span class="v ${vclass}">${esc(verdict)}</span>` : ""));
+    // Heads pop up on goals; full-time moments show once per new outcome.
+    pops.forEach(x => popQueue.push(x)); nextPop();
+    const newLosers = losers.filter(w => !shownLosers.has(w));
+    if (newLosers.length){ losers.forEach(w => shownLosers.add(w)); showBanner(losers, false); }
+    else if (!landedShown && tracked && finished === tracked && allWin && !lostFinal){ landedShown = true; showBanner(cfg.picks.map(p => p.who), true); faceRain(); }
     tickClocks();
     if (firstPaint){ firstPaint = false; setTimeout(() => $("wrap").classList.remove("intro"), 2000); }
+  }
+
+  // ---- Face moments ----
+  const popQueue = [], shownLosers = new Set(); let popping = false, landedShown = false;
+  const listJoin = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " & " + a[a.length - 1];
+  function nextPop(){
+    if (popping || !popQueue.length) return;
+    const x = popQueue.shift(), el = $("pop");
+    el.className = "pop " + (x.ours ? "ours" : "against");
+    el.innerHTML = face(x.who) + `<span class="bub">${x.ours ? "Get in!" : "😬"}</span>`;
+    popping = true; void el.offsetWidth; el.classList.add("show");
+    setTimeout(() => { el.classList.remove("show"); setTimeout(() => { popping = false; nextPop(); }, 550); }, 3200);
+  }
+  function showBanner(whos, won){
+    const el = $("ftban");
+    el.className = "ftban" + (won ? " won" : "");
+    el.innerHTML = `<div class="faces">${whos.map(w => face(w)).join("")}</div><div><b>${won ? "Acca landed!" : "Cheers, " + esc(listJoin(whos))}</b><span>${won ? "All five came in 🎉" : "That's the acca gone"}</span></div>`;
+    void el.offsetWidth; el.classList.add("show");
+    clearTimeout(showBanner.t); showBanner.t = setTimeout(() => el.classList.remove("show"), 6000);
+  }
+  function faceRain(){
+    if (reduce) return;
+    const r = document.createElement("div"); r.className = "rain";
+    const whos = cfg.picks.map(p => p.who); let h = "";
+    for (let i = 0; i < 30; i++){
+      const st = `left:${(Math.random()*92).toFixed(1)}%;--dl:${(Math.random()*2.2).toFixed(2)}s;--t:${(2.6+Math.random()*1.6).toFixed(2)}s;--r:${Math.round(Math.random()*720-360)}deg`;
+      h += face(whos[i % whos.length]).replace('class="face"', `class="face" style="${st}"`);
+    }
+    r.innerHTML = h; document.body.appendChild(r); setTimeout(() => r.remove(), 6500);
   }
 
   // Stats drawer: tap to slide open/closed; state survives refreshes because the page isn't redrawn.
