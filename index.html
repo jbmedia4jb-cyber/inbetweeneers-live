@@ -50,7 +50,23 @@ h1 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background
 .st.ft{background:var(--ink);color:var(--page);box-shadow:none}
 .mood{font:800 11px var(--body);letter-spacing:.06em;text-transform:uppercase}
 .mood.win{color:var(--win)} .mood.draw{color:var(--draw)} .mood.lose{color:var(--lose)}
-.goals{grid-column:1/-1;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 10px}
+.goals{grid-column:1/-1;font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 6px;padding-top:2px}
+.goals .ev{background:var(--page);border-radius:6px;padding:2px 7px;white-space:nowrap}
+.goals .ev b{font:600 11px var(--mono)}
+.goals .ev.us{color:var(--ink);font-weight:700;box-shadow:inset 0 0 0 1px var(--rule)}
+.stats{grid-column:1/-1;display:grid;gap:5px;border-top:1px solid var(--rule);padding-top:9px;margin-top:2px;font-size:13px}
+.stats .sh{display:flex;justify-content:space-between;gap:10px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.stats .sh span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:48%}
+.stats .sh span:first-child{color:var(--ink)}
+.poss{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font:700 12px var(--mono)}
+.pbar{height:8px;border-radius:99px;background:var(--rule);overflow:hidden;display:block}
+.pbar i{display:block;height:100%;background:var(--ink);border-radius:99px 0 0 99px;transition:width .8s ease}
+.sr{display:grid;grid-template-columns:5.2em minmax(0,1fr) 5.2em;align-items:baseline;gap:6px}
+.sr .a,.sr .b{white-space:nowrap}
+.sr .l{text-align:center;color:var(--muted);font-size:12px}
+.sr .a,.sr .b{font:700 13px var(--mono)} .sr .b{text-align:right}
+.sr .a{color:var(--ink)} .sr .b{color:var(--muted)}
+.sr small{font-weight:400;font-size:11px}
 .goals:empty{display:none}
 .fs{grid-column:1/-1;font-size:12.5px;color:var(--muted)}
 .fs a,.foot a{color:var(--ink)}
@@ -79,7 +95,7 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   <ul class="cards" id="cards"></ul>
   <div class="foot">
     <p><a class="btn" id="accaLink" href="#">← Back to the acca table</a></p>
-    <p>Scores from ESPN, checked every 30 seconds while this page is open. Hamilton's league isn't in that feed, so use its Flashscore link. If the page has been in the background, pull down or reopen to refresh.</p>
+    <p>Scores from ESPN, checked every 30 seconds while this page is open. Possession, shots, corners and cards update live too. Scottish leagues aren't in that feed. If the page has been in the background, pull down or reopen to refresh.</p>
   </div>
 </div>
 <script>
@@ -112,12 +128,27 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     const ours = c.competitors.find(x => x.team.displayName === p.espnTeam) || c.competitors.find(x => x.team.displayName.includes(p.team.split(" ")[0]));
     const them = c.competitors.find(x => x !== ours);
     const st = c.status.type;
-    const goals = (c.details||[]).filter(d => d.scoringPlay).map(d => ({
+    // Timeline: goals and cards in minute order.
+    const goals = (c.details||[]).filter(d => d.scoringPlay || d.yellowCard || d.redCard).map(d => ({
+      kind: d.scoringPlay ? "goal" : d.redCard ? "red" : "yellow",
       clock: d.clock && d.clock.displayValue || "",
-      name: (d.athletesInvolved && d.athletesInvolved[0] && d.athletesInvolved[0].shortName) || "Goal",
-      ours: d.team && ours && d.team.id === ours.team.id,
+      secs: d.clock && d.clock.value || 0,
+      name: (d.athletesInvolved && d.athletesInvolved[0] && d.athletesInvolved[0].shortName) || "",
+      ours: !!(d.team && ours && d.team.id === ours.team.id),
       og: !!d.ownGoal, pen: !!d.penaltyKick
-    }));
+    })).sort((a,b) => a.secs - b.secs);
+    // Match stats: [ours, theirs]. Cards are counted from the timeline.
+    const sv = (t, k) => { const s = t && (t.statistics||[]).find(x => x.name === k); return s ? +s.displayValue || 0 : null; };
+    const cardCount = (isOurs, kind) => goals.filter(g => g.kind === kind && g.ours === isOurs).length;
+    const stats = {
+      poss: [sv(ours,"possessionPct"), sv(them,"possessionPct")],
+      shots: [sv(ours,"totalShots"), sv(them,"totalShots")],
+      onT: [sv(ours,"shotsOnTarget"), sv(them,"shotsOnTarget")],
+      corners: [sv(ours,"wonCorners"), sv(them,"wonCorners")],
+      yellow: [cardCount(true,"yellow"), cardCount(false,"yellow")],
+      red: [cardCount(true,"red"), cardCount(false,"red")],
+      colour: ours && /^[0-9a-f]{6}$/i.test(ours.team.color||"") ? "#"+ours.team.color : ""
+    };
     return {
       state: st.state, // pre | in | post
       detail: st.shortDetail || st.description || "",
@@ -125,7 +156,7 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
       usName: ours ? ours.team.displayName : p.team, themName: them ? them.team.displayName : "",
       us: ours ? +ours.score : 0, them: them ? +them.score : 0,
       home: ours ? ours.homeAway === "home" : true,
-      start: new Date(ev.date), goals
+      start: new Date(ev.date), goals, stats
     };
   }
 
@@ -159,14 +190,28 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
       const flashing = flashUntil[key] && flashUntil[key] > now;
       const homeLine = m ? (m.home ? [m.usName,m.us,true] : [m.themName,m.them,false]) : [p.team,"",true];
       const awayLine = m ? (m.home ? [m.themName,m.them,false] : [m.usName,m.us,true]) : ["","",false];
-      const gl = m && m.goals.length ? m.goals.map(g => `${g.ours?"⚽":"·"} ${esc(g.name)} ${esc(g.clock)}${g.pen?" (pen)":""}${g.og?" (og)":""}`).join("</span><span>") : "";
+      const icon = {goal:"⚽", yellow:"🟨", red:"🟥"};
+      const gl = m && m.goals.length ? m.goals.map(g => `<span class="ev${g.ours?" us":""}"><b>${esc(g.clock)}</b> ${icon[g.kind]} ${esc(g.name)}${g.pen?" (pen)":""}${g.og?" (og)":""}</span>`).join("") : "";
+      const sx = m && m.state !== "pre" ? m.stats : null;
+      const pair = (label, a, b) => a == null || b == null ? "" : `<div class="sr"><span class="a">${a}</span><span class="l">${label}</span><span class="b">${b}</span></div>`;
+      let statsHtml = "";
+      if (sx){
+        const p0 = sx.poss[0], p1 = sx.poss[1];
+        const possHtml = p0 == null || p1 == null || p0 + p1 === 0 ? "" :
+          `<div class="poss" role="img" aria-label="Possession ${p0}% to ${p1}%"><span class="pa">${Math.round(p0)}%</span><span class="pbar"><i style="width:${Math.max(0,Math.min(100,p0/(p0+p1)*100)).toFixed(1)}%${sx.colour?";background:"+sx.colour:""}"></i></span><span class="pb">${Math.round(p1)}%</span></div>`;
+        const shotsA = sx.shots[0] == null ? null : `${sx.shots[0]} <small>(${sx.onT[0] ?? 0})</small>`;
+        const shotsB = sx.shots[1] == null ? null : `${sx.shots[1]} <small>(${sx.onT[1] ?? 0})</small>`;
+        const rows = pair("Shots (on target)", shotsA, shotsB) + pair("Corners", sx.corners[0], sx.corners[1]) + pair("🟨 Yellow", sx.yellow[0], sx.yellow[1]) + (sx.red[0] || sx.red[1] ? pair("🟥 Red", sx.red[0], sx.red[1]) : "");
+        if (possHtml || rows) statsHtml = `<div class="stats"><div class="sh"><span>${esc(m.usName)}</span><span>${esc(m.themName)}</span></div>${possHtml}${rows}</div>`;
+      }
       return `<li class="card ${mood}${flashing?" flash":""}">
         ${flashing?`<span class="goalflash">GOAL!</span>`:""}
         <div class="teams"><div class="who">${esc(p.who)}<span class="odds">${esc(p.odds||"")}</span></div>
           <div class="line${homeLine[2]?" ours":""}"><span class="nm">${esc(homeLine[0])}</span><span class="g">${m&&m.state!=="pre"?homeLine[1]:""}</span></div>
           <div class="line${awayLine[2]?" ours":""}"><span class="nm">${esc(awayLine[0])}</span><span class="g">${m&&m.state!=="pre"?awayLine[1]:""}</span></div></div>
         <div class="side">${statusChip(m)}<span class="mood ${mood}">${moodText(mood,m)}</span></div>
-        ${gl?`<div class="goals"><span>${gl}</span></div>`:""}
+        ${statsHtml}
+        ${gl?`<div class="goals">${gl}</div>`:""}
         ${p.fs?`<div class="fs"><a href="${esc(p.fs)}" target="_blank" rel="noopener">Flashscore ↗</a></div>`:""}
       </li>`;
     }).join("");
