@@ -1,11 +1,21 @@
 {
   "date": "2026-11-14",
   "accaPage": "https://claude.ai/artifact/EmE4QdFYEC6DfJrWAN7QBd",
+  "season": {
+    "note": "Season losses up to and including Sat 7 Nov",
+    "losses": {
+      "JT": 11,
+      "Blacky": 8,
+      "Browns": 7,
+      "Poisky": 7,
+      "Coxy": 6
+    }
+  },
   "picks": [
-    { "who": "Browns", "team": "Gillingham",          "odds": "12/5",  "league": "eng.4", "event": "401881275", "espnTeam": "Gillingham" },
-    { "who": "Poisky", "team": "Blackpool",           "odds": "31/20", "league": "eng.3", "event": "401880754", "espnTeam": "Blackpool" },
+    { "who": "Browns", "team": "Gillingham", "odds": "12/5", "league": "eng.4", "event": "401881275", "espnTeam": "Gillingham" },
+    { "who": "Poisky", "team": "Blackpool", "odds": "31/20", "league": "eng.3", "event": "401880754", "espnTeam": "Blackpool" },
     { "who": "Blacky", "team": "Sheffield Wednesday", "odds": "27/20", "league": "eng.3", "event": "401880747", "espnTeam": "Sheffield Wednesday" },
-    { "who": "Coxy",   "team": "Salford City",        "odds": "11/20", "league": "eng.4", "event": "401881268", "espnTeam": "Salford City" },
-    { "who": "JT",     "team": "Carlisle United",     "odds": "4/9",   "league": "eng.5", "event": "401889212", "espnTeam": "Carlisle United" }
+    { "who": "Coxy", "team": "Salford City", "odds": "11/20", "league": "eng.4", "event": "401881268", "espnTeam": "Salford City" },
+    { "who": "JT", "team": "Carlisle United", "odds": "4/9", "league": "eng.5", "event": "401889212", "espnTeam": "Carlisle United" }
   ]
 }
