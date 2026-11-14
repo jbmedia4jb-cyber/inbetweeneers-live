@@ -216,7 +216,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
   <section class="panel reveal" id="panel" aria-label="Live scores" style="--d:80ms"></section>
   <div class="foot">
     <a class="btn" id="accaLink" href="#">← Acca table</a>
-    <span>Scores from ESPN, every 30s · Backup: <a href="https://www.bbc.co.uk/sport/football/scores-fixtures" target="_blank" rel="noopener">BBC ↗</a></span>
+    <span>Scores from ESPN, every 15s · Backup: <a href="https://www.bbc.co.uk/sport/football/scores-fixtures" target="_blank" rel="noopener">BBC ↗</a></span>
   </div>
  </div>
   <aside class="side" id="side" hidden aria-label="Who's lost us the most bets">
@@ -233,7 +233,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
 </div>
 <script>
 (function(){
-  const POLL_MS = 30000;
+  const POLL_MS = 15000;
   const BACKUP = "https://www.bbc.co.uk/sport/football/scores-fixtures";
   const LEAGUES = {"eng.1":"Premier League","eng.2":"Championship","eng.3":"League One","eng.4":"League Two","eng.5":"National League","eng.fa":"FA Cup","eng.league_cup":"League Cup","eng.trophy":"EFL Trophy"};
   const ORDER = ["eng.1","eng.2","eng.3","eng.4","eng.5","eng.fa","eng.league_cup","eng.trophy"];
@@ -607,7 +607,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
       render(results);
       const err = $("err"); if (err) err.remove();
     } catch(e){
-      if (!$("err")) $("panel").insertAdjacentHTML("beforebegin", `<div class="err" id="err">Couldn't reach the live scores just now. Trying again in 30 seconds. Meanwhile: <a href="${BACKUP}" target="_blank" rel="noopener">BBC live scores ↗</a></div>`);
+      if (!$("err")) $("panel").insertAdjacentHTML("beforebegin", `<div class="err" id="err">Couldn't reach the live scores just now. Trying again in 15 seconds. Meanwhile: <a href="${BACKUP}" target="_blank" rel="noopener">BBC live scores ↗</a></div>`);
     }
   }
   tickClocks();
