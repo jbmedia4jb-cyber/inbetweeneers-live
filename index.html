@@ -157,6 +157,30 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
   body.side-open .scrim{opacity:1;pointer-events:auto}
 }
 
+/* Live returns */
+.ret{display:grid;gap:2px;border-radius:6px;padding:10px 12px;background:#f3f5fb;transition:background-color .6s var(--ease),box-shadow .6s var(--ease)}
+.ret .r1{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.ret .lbl{font:700 11px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--grey)}
+.ret .amt{font:800 24px/1.1 var(--body);font-variant-numeric:tabular-nums;color:var(--ink)}
+.ret .amt small{font:600 13px var(--body);color:var(--grey);margin-right:4px}
+.ret .r2{font-size:12.5px;color:var(--grey)}
+.ret .r2 b{color:var(--ink)}
+.ret.on{background:#fff6d6;box-shadow:inset 0 0 0 1px #f0c94a}
+.ret.on .amt{color:#8a6400}
+.ret.risk .amt{color:var(--grey)}
+.ret.dead .amt{color:var(--grey);text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:2px}
+.ret.landed{background:#e8f8ef;box-shadow:inset 0 0 0 1px #6fd39b}
+.ret.landed .amt{color:#13924c}
+/* What they need */
+.need{font:700 11.5px var(--body);letter-spacing:.02em;color:#fff;background:rgba(255,90,78,.22);border-left:3px solid var(--lose);padding:4px 8px;border-radius:2px;justify-self:start}
+.need.draw{background:rgba(255,191,58,.18);border-left-color:var(--draw)}
+.need:empty{display:none}
+/* Sound toggle */
+.snd{background:#eef1f8;border:0;border-radius:50%;width:32px;height:32px;padding:0;font-size:15px;line-height:32px;text-align:center;color:var(--ink);cursor:pointer;flex:none}
+.time{white-space:nowrap}
+.snd[aria-pressed="true"]{background:var(--ink);color:#fff}
+.c1 .right{display:flex;align-items:center;gap:8px}
+
 /* Faces */
 .face{display:block;border-radius:50%;object-fit:cover;background:#ccd3e6;flex:none}
 .bulb{width:38px!important;height:38px!important;padding:3px;display:block}
@@ -205,6 +229,11 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
 
 @media (prefers-reduced-motion:no-preference){
   .badge .ld,.st.live .ld{animation:blink 1.2s ease-in-out infinite}
+  .ret.on .amt{animation:shimmer 2.4s ease-in-out infinite}
+  .need{animation:needIn .45s var(--ease) both}
+  .snd[aria-pressed="true"]{animation:popIn .3s cubic-bezier(.3,1.8,.5,1)}
+  @keyframes shimmer{50%{text-shadow:0 0 14px rgba(240,201,74,.9)}}
+  @keyframes needIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
   .lt.in.win .bulb{animation:bob 1.8s ease-in-out infinite}
   .lt.in.lose .bulb{animation:nervous 2.4s ease-in-out infinite}
   .lt.in.draw .bulb{animation:breathe 2.6s ease-in-out infinite}
@@ -254,9 +283,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
 <div class="wrap intro" id="wrap">
  <div class="main">
   <section class="clock reveal" id="hud" aria-live="polite">
-    <div class="c1"><span class="time" id="time"></span><span class="badge"><span class="ld" aria-hidden="true"></span><b>Inbetweeneers</b>Live</span></div>
+    <div class="c1"><span class="time" id="time"></span><span class="right"><button class="snd" id="snd" type="button" aria-pressed="false" aria-label="Goal sound off: tap to turn on" title="Goal sound: tap to turn on">🔇</button><span class="badge"><span class="ld" aria-hidden="true"></span><b>Inbetweeneers</b></span></span></div>
     <div class="c2"><span id="date"></span><span id="updated"></span></div>
     <ul class="lights" id="lights" aria-label="Acca tracker"></ul>
+    <div class="ret" id="ret" hidden></div>
     <div class="sum" id="summary">Loading scores…</div>
   </section>
   <section class="panel reveal" id="panel" aria-label="Live scores" style="--d:80ms"></section>
@@ -338,6 +368,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
           <div class="gh">${face(p.who)}<span class="who">${esc(p.who)}</span><span class="odds">${esc(p.odds||"")}</span><span class="sp"></span><span class="stw"><span class="st">–</span></span></div>
           <div class="row"><span class="nm">${esc(p.team)}</span><span class="box"></span></div><div class="scorers"></div>
           <div class="row"><span class="nm"></span><span class="box"></span></div><div class="scorers"></div>
+          <div class="need" aria-live="polite"></div>
           <button class="toggle" type="button" hidden aria-expanded="false">Stats</button>
           <div class="drawer"><div class="dr-in"><div class="sgrid">
             <div class="sh"><span></span><span></span></div>
@@ -351,7 +382,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
     $("panel").querySelectorAll(".game[data-k]").forEach(li => {
       const rows = li.querySelectorAll(".row"), sc = li.querySelectorAll(".scorers"), sh = li.querySelectorAll(".sh span"), ps = li.querySelectorAll(".poss > span");
       G[li.dataset.k] = { li, stw: li.querySelector(".stw"), rows, nm: [...rows].map(r => r.querySelector(".nm")), box: [...rows].map(r => r.querySelector(".box")),
-        sc, toggle: li.querySelector(".toggle"), sh, pa: ps[0], pb: ps[2], bar: li.querySelector(".pbar i"), poss: li.querySelector(".poss"), srs: li.querySelector(".srs"), evs: li.querySelector(".evs") };
+        sc, need: li.querySelector(".need"), toggle: li.querySelector(".toggle"), sh, pa: ps[0], pb: ps[2], bar: li.querySelector(".pbar i"), poss: li.querySelector(".poss"), srs: li.querySelector(".srs"), evs: li.querySelector(".evs") };
     });
     $("lights").innerHTML = cfg.picks.map((p, i) => `<li class="lt" title="${esc(p.who)}: ${esc(p.team)}"><span class="bulb">${face(p.who)}</span><span class="nm">${esc(p.who)}</span></li>`).join("");
     buildSide();
@@ -514,6 +545,15 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
         .map(x => x.kind === "red" ? `🟥 ${esc(surname(x.name))} ${esc(minute(x.clock))}` : goalLabel(x)).join(", ");
       setHTML(g.sc[k], sc);
     });
+    // What they need: only while the game is on and our team isn't winning.
+    let need = "", needCls = "need";
+    if (m.state === "in" && mood !== "win"){
+      const diff = m.them - m.us;
+      need = diff <= 0 ? "Need 1 goal to win" : `Need ${diff} to draw, ${diff + 1} to win`;
+      if (diff <= 0) needCls += " draw";
+    }
+    if (g.need.className !== needCls) g.need.className = needCls;
+    if (g.need.textContent !== need) g.need.textContent = need;
     g.toggle.hidden = !played;
     if (!played) return;
     const sx = m.stats;
@@ -612,6 +652,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
     if (voids.length) verdict += `${verdict ? " · " : ""}${voids.join(", ")} void`;
     $("hud").classList.toggle("oncourse", !!allWin && !lostFinal);
     setHTML($("summary"), summary + (verdict ? ` · <span class="v ${vclass}">${esc(verdict)}</span>` : ""));
+    renderReturns(results, {started, finished, tracked, lostFinal, allWin});
+    if (!firstPaint && pops.length) roar(pops.some(x => x.ours));
     // Heads pop up on goals; full-time moments show once per new outcome.
     pops.forEach(x => popQueue.push(x)); nextPop();
     const newLosers = losers.filter(w => !shownLosers.has(w));
@@ -620,6 +662,79 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
     tickClocks();
     if (firstPaint){ firstPaint = false; setTimeout(() => $("wrap").classList.remove("intro"), 2000); }
   }
+
+  // ---- Live returns ----
+  const decOdds = f => {
+    const s = String(f || "").trim();
+    if (/^evens?$/i.test(s)) return 2;
+    const m = s.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
+    if (m) return 1 + (+m[1]) / (+m[2]);
+    const n = parseFloat(s); return n > 1 ? n : null;
+  };
+  const money = v => "£" + v.toLocaleString("en-GB", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  let retShown = null;
+  function renderReturns(results, s){
+    const stake = +cfg.stake; const el = $("ret");
+    if (!stake){ el.hidden = true; return; }
+    let mult = 1, ok = true;
+    const notWinning = [];
+    cfg.picks.forEach((p, i) => {
+      const m = results[i];
+      if (m && m.state === "void") return;           // void legs drop out of the acca
+      const d = decOdds(p.odds); if (!d){ ok = false; return; }
+      mult *= d;
+      if (m && (m.state === "in" || m.state === "post") && moodOf(m) !== "win") notWinning.push(p.who);
+    });
+    if (!ok){ el.hidden = true; return; }
+    const total = Math.round(stake * mult * 100) / 100;
+    let cls = "ret", lbl = `£${stake} returns`, line = "";
+    if (s.lostFinal){ cls += " dead"; lbl = "Would have paid"; line = "Acca's gone 😩"; }
+    else if (s.tracked && s.finished === s.tracked && s.allWin){ cls += " landed"; lbl = `£${stake} returned`; line = "Acca landed! 🎉"; }
+    else if (s.started && notWinning.length){ cls += " risk"; lbl = "As it stands: £0"; line = `Needs <b>${esc(listJoin(notWinning))}</b> to come good for ${money(total)}`; }
+    else if (s.started){ cls += " on"; lbl = "On course for"; line = "Every pick winning right now"; }
+    else line = `${cfg.picks.length}-fold at ${(mult - 1).toFixed(2)}/1`;
+    el.hidden = false; el.className = cls;
+    setHTML(el, `<div class="r1"><span class="lbl">${lbl}</span><span class="amt" id="amt">${money(retShown ?? total)}</span></div>${line ? `<div class="r2">${line}</div>` : ""}`);
+    // Count the amount up or down when it changes (e.g. a void leg).
+    const a = $("amt"), from = retShown ?? total; retShown = total;
+    if (from !== total && !reduce){
+      const t0 = performance.now(), dur = 900;
+      const step = t => { const k = Math.min(1, (t - t0) / dur), v = from + (total - from) * (1 - Math.pow(1 - k, 3)); a.textContent = money(Math.round(v * 100) / 100); if (k < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    } else a.textContent = money(total);
+  }
+
+  // ---- Goal sound: a synthesised crowd roar (no sound files). Off until tapped, because phones block sound until then. ----
+  let ac = null, soundOn = false;
+  function ensureAC(){
+    if (!ac){ const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; ac = new C(); }
+    if (ac.state === "suspended") ac.resume();
+    return ac;
+  }
+  function roar(good, vol){
+    if (!soundOn) return;
+    const ctx = ensureAC(); if (!ctx) return;
+    const t = ctx.currentTime, dur = good ? 3.2 : 1.6, peak = (vol || 1) * (good ? 0.8 : 0.3);
+    const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    [[good ? 600 : 350, good ? 1100 : 300, 0.7], [good ? 1800 : 600, good ? 2400 : 500, 0.35]].forEach(([f0, f1, mix]) => {
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 0.7;
+      bp.frequency.setValueAtTime(f0, t); bp.frequency.linearRampToValueAtTime(f1, t + 0.9);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak * mix, t + (good ? 0.4 : 0.25));
+      g.gain.setValueAtTime(peak * mix, t + dur * 0.45);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      src.connect(bp).connect(g).connect(ctx.destination); src.start(t); src.stop(t + dur);
+    });
+  }
+  $("snd").addEventListener("click", () => {
+    soundOn = !soundOn;
+    const b = $("snd"); b.setAttribute("aria-pressed", String(soundOn)); b.textContent = soundOn ? "🔊" : "🔇";
+    b.setAttribute("aria-label", soundOn ? "Goal sound on: tap to turn off" : "Goal sound off: tap to turn on");
+    if (soundOn){ ensureAC(); roar(true, 0.35); }   // quiet preview so you know it works
+  });
 
   // ---- Face moments ----
   const popQueue = [], shownLosers = new Set(); let popping = false, landedShown = false;
