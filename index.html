@@ -3,197 +3,178 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0a1a5c">
+<meta name="theme-color" content="#0b2382">
 <title>Inbetweeneers Live</title>
 <meta name="description" content="Live scores for this week's Inbetweeneers acca picks.">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Martian+Mono:wght@400;600;700&display=swap">
 <style>
-/* Saturday-afternoon results-show look: white clock panel, royal-blue scores panel, white ticker fixed at the bottom. */
+/* Saturday results-show look, tidied: white clock panel, blue scores panel, slim goal strip + ticker at the bottom. */
 :root{
-  --studio:#071446; --blue:#1d3cb0; --blue2:#15308f; --blue3:#0f2470; --line:rgba(255,255,255,.18);
-  --paper:#ffffff; --ink:#0b1640; --grey:#5d6684; --soft:#c9d4ff; --orange:#e5461b; --red:#d8231f;
-  --win:#28c76f; --draw:#ffbf3a; --lose:#ff5a4e; --gold:#ffd447;
+  --studio:#071446; --blue:#1d3cb0; --blue2:#15308f; --blue3:#102674; --line:rgba(255,255,255,.14);
+  --paper:#fff; --ink:#0b1640; --grey:#626b88; --soft:#b9c6f5; --orange:#e5461b; --red:#d8231f;
+  --win:#2fd07a; --draw:#ffbf3a; --lose:#ff5a4e; --gold:#ffd447; --off:#8b93ab;
   --body:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"Martian Mono",ui-monospace,Consolas,monospace;
+  --ease:cubic-bezier(.2,.8,.2,1);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0}
 body{min-height:100vh;color:#fff;font:15px/1.35 var(--body);overflow-x:hidden;
-  background:
-    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(90,140,255,.35), transparent 70%),
-    radial-gradient(circle at 15% 30%, rgba(255,255,255,.05) 0 60px, transparent 61px),
-    radial-gradient(circle at 85% 55%, rgba(255,255,255,.05) 0 70px, transparent 71px),
-    linear-gradient(180deg,#1236b8 0%, #0b2382 40%, var(--studio) 100%);
+  background:radial-gradient(ellipse 80% 40% at 50% 0%, rgba(110,150,255,.32), transparent 70%), linear-gradient(180deg,#1236b8 0%, #0b2382 45%, var(--studio) 100%);
   background-color:var(--studio);
-  padding:env(safe-area-inset-top,0px) 0 var(--bottom,120px)}
-.wrap{max-width:560px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px));display:grid;gap:12px}
+  padding:env(safe-area-inset-top,0px) 0 var(--bottom,90px)}
+.wrap{max-width:540px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 20px max(16px,env(safe-area-inset-left,0px));display:grid;gap:12px}
 .wrap > *{min-width:0}
 
-/* White clock panel */
-.clock{background:var(--paper);color:var(--ink);border-radius:4px;padding:12px 14px 12px;box-shadow:0 14px 34px -18px #000;display:grid;gap:10px}
-.ctop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.time{font:300 34px/1 var(--body);letter-spacing:-.01em}
-.day{font:400 13px var(--body);color:var(--grey);margin-top:4px}
-.badge{display:inline-flex;align-items:center;gap:6px;font:800 11px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink);white-space:nowrap}
-.badge b{background:var(--red);color:#fff;padding:2px 6px;border-radius:3px;letter-spacing:.08em}
-.badge .ld{width:7px;height:7px;border-radius:50%;background:var(--red)}
-.lights{list-style:none;margin:0;padding:10px 0 0;border-top:1px solid #e3e7f2;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
-.lt{display:grid;justify-items:center;gap:4px;min-width:0}
-.bulb{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:900 13px var(--body);color:#fff;background:#d5dbea}
-.lt.win .bulb{background:var(--win);box-shadow:0 0 10px rgba(40,199,111,.6)}
-.lt.draw .bulb{background:var(--draw);box-shadow:0 0 10px rgba(255,191,58,.6)}
-.lt.lose .bulb{background:var(--lose);box-shadow:0 0 10px rgba(255,90,78,.6)}
-.lt.void .bulb{background:#8b93ab}
+/* Clock panel */
+.clock{background:var(--paper);color:var(--ink);border-radius:6px;padding:14px 16px;display:grid;gap:12px;box-shadow:0 16px 36px -22px #000;transition:box-shadow .8s var(--ease)}
+.clock.oncourse{box-shadow:0 0 0 2px var(--gold),0 0 28px -4px rgba(255,212,71,.55)}
+.c1{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.time{font:300 30px/1 var(--body);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.badge{display:inline-flex;align-items:center;gap:6px;font:800 10.5px var(--body);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.badge b{background:var(--red);color:#fff;padding:3px 6px;border-radius:3px}
+.badge .ld{width:6px;height:6px;border-radius:50%;background:var(--red)}
+.c2{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--grey);margin-top:-6px}
+.lights{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.lt{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
+.bulb{width:14px;height:14px;border-radius:50%;background:#dfe3ee;transition:background-color .6s var(--ease),box-shadow .6s var(--ease)}
+.lt.win .bulb{background:var(--win);box-shadow:0 0 0 4px rgba(47,208,122,.18)}
+.lt.draw .bulb{background:var(--draw);box-shadow:0 0 0 4px rgba(255,191,58,.2)}
+.lt.lose .bulb{background:var(--lose);box-shadow:0 0 0 4px rgba(255,90,78,.18)}
+.lt.void .bulb{background:var(--off)}
 .lt .nm{font:700 10px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--grey);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sum{font:700 15px var(--body);color:var(--ink)}
-.sum .n{color:var(--blue)}
-.small{font-size:12.5px;color:var(--grey);display:flex;justify-content:space-between;flex-wrap:wrap;gap:2px 12px}
-.verdict{font-weight:700}
-.verdict.win{color:#13924c} .verdict.lose{color:var(--red)}
-.clock.oncourse{box-shadow:0 0 0 3px var(--gold),0 14px 34px -18px #000}
+.lt.post .nm::after{content:" ✓";color:#13924c}
+.lt.post.lose .nm::after,.lt.post.draw .nm::after{content:" ✕";color:var(--red)}
+.lt.void .nm::after{content:" –"}
+.sum{font:600 14px/1.35 var(--body);border-top:1px solid #e8ebf3;padding-top:10px}
+.sum .n{color:var(--blue);font-weight:800}
+.sum .v.win{color:#13924c} .sum .v.lose{color:var(--red)} .sum .v{font-weight:700}
 
-/* Blue scores panel */
-.panel{background:linear-gradient(180deg,var(--blue) 0%,var(--blue2) 55%,var(--blue3) 100%);border-radius:4px;overflow:hidden;box-shadow:0 18px 40px -20px #000}
-.panel::before{content:"";display:block;height:3px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent)}
-.league{padding:10px 14px 4px;font:300 15px var(--body);color:#e8edff;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px}
-.league:first-of-type{border-top:0}
+/* Scores panel */
+.panel{background:linear-gradient(180deg,var(--blue) 0%,var(--blue2) 60%,var(--blue3) 100%);border-radius:6px;overflow:hidden;box-shadow:0 18px 40px -22px #000;padding-bottom:6px}
+.league{padding:14px 16px 2px;font:400 12px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--soft);display:flex;align-items:center;gap:10px}
 .league::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
 .games{list-style:none;margin:0;padding:0}
-.game{position:relative;padding:8px 14px 12px;display:grid;gap:4px}
-.game + .game{border-top:1px dashed rgba(255,255,255,.12)}
-.gh{display:flex;align-items:center;gap:8px;min-width:0}
-.who{font:800 10.5px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
-.odds{font:700 10.5px var(--mono);color:var(--ink);background:var(--gold);padding:1px 6px;border-radius:3px}
+.game{padding:10px 16px 8px;display:grid;gap:6px}
+.gh{display:flex;align-items:center;gap:8px;min-width:0;font-size:11px}
+.who{font:700 11px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.odds{font:600 11px var(--mono);color:var(--gold)}
 .gh .sp{flex:1}
-.mood{font:800 10.5px var(--body);letter-spacing:.12em;text-transform:uppercase}
-.mood.win{color:#6ff2a6} .mood.draw{color:var(--draw)} .mood.lose{color:#ff8d84} .mood.void{color:var(--soft)}
-.st{font:700 11px var(--mono);padding:2px 7px;border-radius:3px;white-space:nowrap;background:rgba(255,255,255,.14);color:#fff;display:inline-flex;align-items:center;gap:5px}
+.st{font:700 11px var(--mono);padding:2px 7px;border-radius:3px;white-space:nowrap;background:rgba(255,255,255,.12);color:#fff;display:inline-flex;align-items:center;gap:5px}
 .st.live{background:var(--red)}
-.st.live .ld{width:6px;height:6px;border-radius:50%;background:#fff}
+.st.live .ld{width:5px;height:5px;border-radius:50%;background:#fff}
 .st.ht{background:var(--draw);color:var(--ink)}
 .st.ft{background:#fff;color:var(--ink)}
-.st.void{background:rgba(255,255,255,.22)}
-.row{display:grid;grid-template-columns:4px minmax(0,1fr) 30px;align-items:center;gap:9px}
-.row .kit{height:20px;border-radius:1px;background:rgba(255,255,255,.25)}
-.row.ours .kit{background:var(--team,#fff)}
-.row .nm{font:400 19px/1.15 var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e3e9ff}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 30px;align-items:center;gap:10px}
+.row .nm{font:400 17px/1.2 var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#d9e2ff}
 .row.ours .nm{font-weight:700;color:#fff}
-.box{perspective:160px;display:block;height:28px}
-.box span{display:block;height:28px;background:#fff;color:var(--ink);font:800 19px/28px var(--body);text-align:center;border-radius:1px;font-variant-numeric:tabular-nums;transform-origin:50% 50%}
-.box:empty{background:transparent}
-.scorers{grid-column:2/-1;font:400 11.5px/1.3 var(--body);color:var(--soft);margin:-1px 0 3px;overflow-wrap:anywhere}
+.row.ours .nm::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--team,#fff);margin-right:8px;vertical-align:3px}
+.box{position:relative;height:30px;border-radius:3px;overflow:hidden;background:#fff;color:var(--ink);transition:box-shadow .6s var(--ease)}
+.box:empty{background:rgba(255,255,255,.1)}
+.box span{position:absolute;inset:0;display:grid;place-items:center;font:800 18px var(--body);font-variant-numeric:tabular-nums}
+.game.win .row.ours .box{box-shadow:0 0 0 2px var(--win)}
+.game.draw .row.ours .box{box-shadow:0 0 0 2px var(--draw)}
+.game.lose .row.ours .box{box-shadow:0 0 0 2px var(--lose)}
+.scorers{font:400 11.5px/1.3 var(--body);color:var(--soft);margin-top:-3px;overflow-wrap:anywhere}
 .scorers:empty{display:none}
-.game.void{opacity:.6}
-.game.flash .box span{background:var(--gold)}
+.game.void{opacity:.55}
 .fs{font-size:12px;color:var(--soft)} .fs a{color:#fff}
 
-/* Stats (tap to open) */
-details.stats{margin-top:4px;border-top:1px solid rgba(255,255,255,.12);padding-top:6px}
-details.stats summary{list-style:none;cursor:pointer;font:700 11px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--soft);display:flex;align-items:center;gap:6px;width:max-content;padding:4px 0}
-details.stats summary::-webkit-details-marker{display:none}
-details.stats summary::after{content:"▾";transition:transform .25s}
-details.stats[open] summary::after{transform:rotate(180deg)}
-.sgrid{display:grid;gap:6px;padding:6px 0 2px;font-size:13px}
-.sh{display:flex;justify-content:space-between;gap:10px;font:700 10.5px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+/* Stats drawer */
+.toggle{justify-self:start;background:none;border:0;padding:4px 0;color:var(--soft);font:700 10.5px var(--body);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.toggle::after{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .3s var(--ease)}
+.game.open .toggle::after{transform:translateY(1px) rotate(-135deg)}
+.drawer{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ease)}
+.game.open .drawer{grid-template-rows:1fr}
+.dr-in{overflow:hidden;min-height:0}
+.sgrid{display:grid;gap:7px;padding:6px 0 8px;font-size:13px;opacity:0;transform:translateY(-4px);transition:opacity .3s,transform .4s var(--ease)}
+.game.open .sgrid{opacity:1;transform:none}
+.sh{display:flex;justify-content:space-between;gap:10px;font:700 10px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
 .sh span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:48%}
 .sh span:first-child{color:#fff}
-.poss{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font:700 12px var(--mono)}
-.pbar{height:8px;background:rgba(255,255,255,.22);overflow:hidden;display:block;border-radius:1px}
-.pbar i{display:block;height:100%;background:var(--team,#fff);transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
-.sr{display:grid;grid-template-columns:5.2em minmax(0,1fr) 5.2em;align-items:baseline;gap:6px}
-.sr .l{text-align:center;color:var(--soft);font-size:12px}
-.sr .a,.sr .b{font:700 13px var(--mono);white-space:nowrap}
+.poss{display:grid;grid-template-columns:2.6em minmax(0,1fr) 2.6em;gap:8px;align-items:center;font:600 11.5px var(--mono)}
+.poss span:last-child{text-align:right}
+.pbar{height:6px;background:rgba(255,255,255,.2);overflow:hidden;display:block;border-radius:3px}
+.pbar i{display:block;height:100%;width:0;background:var(--team,#fff);border-radius:3px;transition:width 1.2s var(--ease)}
+.sr{display:grid;grid-template-columns:5em minmax(0,1fr) 5em;align-items:baseline;gap:6px}
+.sr .l{text-align:center;color:var(--soft);font-size:11.5px}
+.sr .a,.sr .b{font:600 12.5px var(--mono);white-space:nowrap}
 .sr .b{text-align:right;color:var(--soft)}
-.sr small{font-weight:400;font-size:11px;opacity:.8}
-.cards{display:flex;flex-wrap:wrap;gap:4px 6px}
-.ev{background:rgba(255,255,255,.1);border-radius:3px;padding:2px 7px;white-space:nowrap;font-size:12px;color:var(--soft)}
-.ev b{font:600 10.5px var(--mono);margin-right:2px}
+.sr small{font-weight:400;font-size:10.5px;opacity:.8}
+.evs{display:flex;flex-wrap:wrap;gap:4px 6px}
+.evs:empty{display:none}
+.ev{background:rgba(255,255,255,.09);border-radius:3px;padding:2px 7px;white-space:nowrap;font-size:11.5px;color:var(--soft)}
+.ev b{font:600 10px var(--mono);margin-right:2px}
 .ev.us{color:#fff;font-weight:700}
 
-.stale{background:#fff5d1;color:var(--ink);border-radius:4px;padding:10px 12px;font-size:13px;box-shadow:inset 0 0 0 1px #f0c94a}
-.err{background:#ffe3e1;color:var(--ink);border-radius:4px;padding:10px 12px;font-size:13px}
+.stale{background:#fff5d1;color:var(--ink);border-radius:6px;padding:10px 12px;font-size:13px}
+.err{background:#ffe3e1;color:var(--ink);border-radius:6px;padding:10px 12px;font-size:13px}
 .err a{color:var(--ink);font-weight:700}
-.foot{font-size:12.5px;color:var(--soft);display:grid;gap:8px}
-.foot p{margin:0}
+.foot{font-size:12px;color:var(--soft);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 12px}
 .foot a{color:#fff}
-.foot a.btn{display:inline-block;font:800 14px var(--body);padding:10px 16px;border-radius:3px;background:#fff;color:var(--ink);text-decoration:none}
-a:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.foot a.btn{font:800 13.5px var(--body);padding:9px 14px;border-radius:4px;background:#fff;color:var(--ink);text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
-/* Bottom: latest goals + ticker, fixed */
-.bottom{position:fixed;left:0;right:0;bottom:0;z-index:20;padding-bottom:env(safe-area-inset-bottom,0px);background:#fff;box-shadow:0 -10px 30px -12px rgba(0,0,0,.6)}
-.goalrows{list-style:none;margin:0;padding:4px 0 2px;background:linear-gradient(180deg,#fff,#f3f5fb)}
+/* Bottom strip */
+.bottom{position:fixed;left:0;right:0;bottom:0;z-index:20;padding-bottom:env(safe-area-inset-bottom,0px);background:#fff;box-shadow:0 -8px 24px -12px rgba(0,0,0,.55)}
+.goalrows{list-style:none;margin:0;padding:3px 0 1px}
 .goalrows:empty{display:none}
-.gr{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:8px;align-items:baseline;padding:2px max(12px,env(safe-area-inset-left,0px));font:700 11.5px/1.35 var(--body);font-stretch:80%;text-transform:uppercase;color:var(--ink)}
-.gr .tag{color:var(--red);font-weight:900;letter-spacing:.04em}
+.gr{display:grid;grid-template-columns:3.6em minmax(0,1fr) auto;gap:8px;align-items:baseline;padding:2px max(12px,env(safe-area-inset-left,0px));font:700 11.5px/1.4 var(--body);font-stretch:82%;text-transform:uppercase;color:var(--ink)}
+.gr .tag{color:var(--red);font-weight:900;white-space:nowrap}
 .gr .fx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gr .fx .sc{color:var(--red)}
 .gr .by{color:var(--red);white-space:nowrap}
-.gr.ours .tag::after{content:" ★";color:var(--gold)}
-.ticker{height:30px;display:flex;align-items:center;overflow:hidden;border-top:2px solid var(--orange);background:#fff}
-.track{display:flex;align-items:center;white-space:nowrap;padding-left:12px;font:800 14px var(--body);font-stretch:78%;text-transform:uppercase;color:var(--ink);will-change:transform}
+.gr.ours .tag::after{content:" ★";color:#e8a800}
+.ticker{height:26px;display:flex;align-items:center;overflow:hidden;border-top:2px solid var(--orange);background:#fff;touch-action:pan-y}
+.track{display:flex;align-items:center;white-space:nowrap;padding-left:12px;font:800 13px var(--body);font-stretch:80%;text-transform:uppercase;color:var(--ink)}
 .ti{margin-right:28px}
 .ti .by{color:var(--orange)}
-.ti .who{color:var(--blue);font-size:11px;margin-right:6px;letter-spacing:.06em}
+.ti .who{color:var(--blue);font-size:10.5px;margin-right:6px;letter-spacing:.06em}
 
 @media (prefers-reduced-motion:no-preference){
-  .badge .ld,.st.live .ld{animation:blink 1.1s ease-in-out infinite}
+  .badge .ld,.st.live .ld{animation:blink 1.2s ease-in-out infinite}
+  .lt.in .bulb{animation:breathe 2.4s ease-in-out infinite}
   .track{animation:scroll var(--dur,40s) linear infinite}
-  .lt.in .bulb{animation:glow 1.6s ease-in-out infinite}
-  .lt.post .bulb,.lt.void .bulb{animation:pop .5s cubic-bezier(.3,1.8,.5,1) both}
-  .intro .clock{animation:drop .6s cubic-bezier(.2,.9,.3,1.2) both}
-  .intro .panel{animation:wipe .8s .15s cubic-bezier(.2,.9,.3,1) both}
-  .intro .league{animation:slide .5s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--d) + .35s)}
-  .intro .game{animation:slide .55s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--d) + .45s)}
-  .intro .lt{animation:pop .5s cubic-bezier(.3,1.8,.5,1) both;animation-delay:calc(var(--d) + .2s)}
-  .bottom{animation:up .6s .3s cubic-bezier(.2,.9,.3,1) backwards}
-  .box span.flip{animation:flip .7s cubic-bezier(.3,1.4,.5,1) both}
-  .game.flash .box span{animation:flash 1s ease-in-out 4}
-  .game.flash::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,212,71,.25),transparent 70%);animation:fade 3s ease-out both;pointer-events:none}
-  .gr.new{animation:goalin .6s cubic-bezier(.2,.9,.3,1.2) both, redflash 1s .6s ease-in-out 4}
-  .clock.oncourse{animation:gold 2s ease-in-out infinite}
-  details.stats[open] .sgrid{animation:open .35s ease-out both}
-  @keyframes blink{50%{opacity:.2}}
+  .ticker.hold .track{animation-play-state:paused}
+  .intro .reveal{animation:fadeUp .6s var(--ease) both;animation-delay:var(--d,0ms)}
+  .intro .bottom{animation:fadeUp .6s .5s var(--ease) both}
+  .box span.out{animation:rollOut .55s var(--ease) both}
+  .box span.in{animation:rollIn .55s var(--ease) both}
+  .box.scored{animation:ripple 1.6s ease-out 2}
+  .gr.new{animation:slideIn .5s var(--ease) both, tint 2.4s .5s ease-in-out}
+  @keyframes blink{50%{opacity:.25}}
+  @keyframes breathe{50%{transform:scale(1.18)}}
   @keyframes scroll{to{transform:translateX(-50%)}}
-  @keyframes glow{50%{filter:brightness(1.25);transform:scale(1.1)}}
-  @keyframes pop{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
-  @keyframes drop{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
-  @keyframes wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
-  @keyframes slide{from{transform:translateX(-24px);opacity:0}to{transform:none;opacity:1}}
-  @keyframes up{from{transform:translateY(100%)}to{transform:none}}
-  @keyframes flip{0%{transform:rotateX(-100deg)}100%{transform:none}}
-  @keyframes flash{50%{background:#fff}}
-  @keyframes fade{from{opacity:1}to{opacity:0}}
-  @keyframes goalin{from{transform:translateX(-100%);opacity:0}to{transform:none;opacity:1}}
-  @keyframes redflash{50%{background:#ffe1df}}
-  @keyframes gold{50%{box-shadow:0 0 0 3px var(--gold),0 0 26px 2px rgba(255,212,71,.6)}}
-  @keyframes open{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes rollOut{to{transform:translateY(-100%);opacity:0}}
+  @keyframes rollIn{from{transform:translateY(100%);opacity:0}to{transform:none;opacity:1}}
+  @keyframes ripple{0%{box-shadow:0 0 0 2px var(--gold),0 0 0 0 rgba(255,212,71,.7)}100%{box-shadow:0 0 0 2px var(--gold),0 0 0 14px rgba(255,212,71,0)}}
+  @keyframes slideIn{from{transform:translateX(-30px);opacity:0}to{transform:none;opacity:1}}
+  @keyframes tint{0%,100%{background:transparent}30%,70%{background:#ffe9e7}}
 }
 </style>
 </head>
 <body>
 <div class="wrap intro" id="wrap">
-  <section class="clock" id="hud" aria-live="polite">
-    <div class="ctop">
-      <div><div class="time" id="time"></div><div class="day" id="date"></div></div>
-      <span class="badge"><span class="ld" aria-hidden="true"></span><b>Inbetweeneers</b>Live</span>
-    </div>
+  <section class="clock reveal" id="hud" aria-live="polite">
+    <div class="c1"><span class="time" id="time"></span><span class="badge"><span class="ld" aria-hidden="true"></span><b>Inbetweeneers</b>Live</span></div>
+    <div class="c2"><span id="date"></span><span id="updated"></span></div>
     <ul class="lights" id="lights" aria-label="Acca tracker"></ul>
     <div class="sum" id="summary">Loading scores…</div>
-    <div class="small"><span id="verdict" class="verdict"></span><span id="updated"></span></div>
   </section>
-  <section class="panel" id="panel" aria-label="Live scores"></section>
+  <section class="panel reveal" id="panel" aria-label="Live scores" style="--d:80ms"></section>
   <div class="foot">
-    <p><a class="btn" id="accaLink" href="#">← Back to the acca table</a></p>
-    <p>Scores and stats from ESPN, checked every 30 seconds while this page is open. Tap "Stats" under a game for possession, shots, corners and cards. Scottish leagues aren't in that feed.</p>
-    <p>Backup if scores stop updating: <a href="https://www.bbc.co.uk/sport/football/scores-fixtures" target="_blank" rel="noopener">BBC live scores ↗</a></p>
+    <a class="btn" id="accaLink" href="#">← Acca table</a>
+    <span>Scores from ESPN, every 30s · Backup: <a href="https://www.bbc.co.uk/sport/football/scores-fixtures" target="_blank" rel="noopener">BBC ↗</a></span>
   </div>
 </div>
 <div class="bottom" id="bottom">
   <ul class="goalrows" id="goalrows" aria-label="Latest goals"></ul>
-  <div class="ticker" aria-hidden="true"><div class="track" id="ticker"><span class="ti">Loading scores…</span></div></div>
+  <div class="ticker" id="tickerBox" aria-hidden="true"><div class="track" id="ticker"><span class="ti">Loading scores…</span></div></div>
 </div>
 <script>
 (function(){
@@ -204,12 +185,13 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offs
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let cfg = null, lastOk = 0, prev = {}, possPrev = {}, flashUntil = {}, firstPaint = true, tickerSig = "", koAt = 0;
-  const openStats = new Set(), seenGoals = new Set();
+  let cfg = null, lastOk = 0, prev = {}, firstPaint = true, tickerSig = "", koAt = 0;
+  const G = {}, seenGoals = new Set();
 
   function ukDate(iso){ const d = new Date(iso+"T12:00:00"); return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
   function ukTime(d){ return d.toLocaleTimeString("en-GB",{hour:"numeric",minute:"2-digit",hour12:true,timeZone:"Europe/London"}).replace(":00","").replace(/\s/g,"").toLowerCase(); }
   function nowClock(){ return new Date().toLocaleTimeString("en-GB",{hour:"numeric",minute:"2-digit",hour12:true,timeZone:"Europe/London"}).replace(/\s?([ap])\.?m\.?/i," $1m").toLowerCase(); }
+  const setHTML = (el, html) => { if (el && el.innerHTML !== html) el.innerHTML = html; };
 
   // Team colour that shows up on the blue panel.
   function teamColour(t){
@@ -230,6 +212,43 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offs
     const todayUK = new Date().toLocaleDateString("en-CA", {timeZone:"Europe/London"});
     const daysOld = Math.round((new Date(todayUK) - new Date(cfg.date)) / 864e5);
     if (daysOld >= 2) $("panel").insertAdjacentHTML("beforebegin", `<div class="stale">These are the picks from ${esc(ukDate(cfg.date))}. This week's haven't been added yet.</div>`);
+    buildSkeleton();
+  }
+
+  // Build the page once; later updates only touch what changed.
+  function buildSkeleton(){
+    const groups = {};
+    cfg.picks.forEach((p, i) => { const k = p.league || "other"; (groups[k] = groups[k] || []).push(i); });
+    const keys = Object.keys(groups).sort((a,b) => (ORDER.indexOf(a)+1 || 99) - (ORDER.indexOf(b)+1 || 99));
+    let n = 0;
+    $("panel").innerHTML = keys.map(k => {
+      const head = `<div class="league">${esc(LEAGUES[k] || (k === "other" ? "Other leagues" : k))}</div>`;
+      return head + `<ul class="games">` + groups[k].map(i => {
+        const p = cfg.picks[i], d = `--d:${160 + (n++)*90}ms`;
+        if (!p.event) return `<li class="game reveal" style="${d}"><div class="gh"><span class="who">${esc(p.who)}</span><span class="odds">${esc(p.odds||"")}</span><span class="sp"></span><span class="st">${esc(p.ko||"")}</span></div>
+          <div class="row ours"><span class="nm">${esc(p.team)}</span><span class="box"></span></div>
+          <div class="row"><span class="nm">${p.away?"at ":"v "}${esc(p.opponent||"")}</span><span class="box"></span></div>
+          ${p.fs?`<div class="fs">Not in the live feed. <a href="${esc(p.fs)}" target="_blank" rel="noopener">Flashscore ↗</a></div>`:""}</li>`;
+        return `<li class="game reveal" data-k="${esc(p.event)}" style="${d}">
+          <div class="gh"><span class="who">${esc(p.who)}</span><span class="odds">${esc(p.odds||"")}</span><span class="sp"></span><span class="stw"><span class="st">–</span></span></div>
+          <div class="row"><span class="nm">${esc(p.team)}</span><span class="box"></span></div><div class="scorers"></div>
+          <div class="row"><span class="nm"></span><span class="box"></span></div><div class="scorers"></div>
+          <button class="toggle" type="button" hidden aria-expanded="false">Stats</button>
+          <div class="drawer"><div class="dr-in"><div class="sgrid">
+            <div class="sh"><span></span><span></span></div>
+            <div class="poss"><span></span><span class="pbar"><i></i></span><span></span></div>
+            <div class="srs"></div><div class="evs"></div>
+          </div></div></div>
+          ${p.fs?`<div class="fs"><a href="${esc(p.fs)}" target="_blank" rel="noopener">Flashscore ↗</a></div>`:""}
+        </li>`;
+      }).join("") + `</ul>`;
+    }).join("");
+    $("panel").querySelectorAll(".game[data-k]").forEach(li => {
+      const rows = li.querySelectorAll(".row"), sc = li.querySelectorAll(".scorers"), sh = li.querySelectorAll(".sh span"), ps = li.querySelectorAll(".poss > span");
+      G[li.dataset.k] = { li, stw: li.querySelector(".stw"), rows, nm: [...rows].map(r => r.querySelector(".nm")), box: [...rows].map(r => r.querySelector(".box")),
+        sc, toggle: li.querySelector(".toggle"), sh, pa: ps[0], pb: ps[2], bar: li.querySelector(".pbar i"), poss: li.querySelector(".poss"), srs: li.querySelector(".srs"), evs: li.querySelector(".evs") };
+    });
+    $("lights").innerHTML = cfg.picks.map((p, i) => `<li class="lt" title="${esc(p.who)}: ${esc(p.team)}"><span class="bulb"></span><span class="nm">${esc(p.who)}</span></li>`).join("");
   }
 
   async function fetchLeague(lg){
@@ -282,139 +301,126 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offs
   function statusChip(m){
     if (!m) return `<span class="st">–</span>`;
     if (m.state === "pre") return `<span class="st">${esc(ukTime(m.start))}</span>`;
-    if (m.state === "void") return `<span class="st void">${esc(m.detail || "Off")}</span>`;
+    if (m.state === "void") return `<span class="st">${esc(m.detail || "Off")}</span>`;
     if (m.state === "post") return `<span class="st ft">FT</span>`;
     if (isHT(m)) return `<span class="st ht">HT</span>`;
     const fixed = /\+/.test(m.detail) || !m.clockSecs ? 1 : 0;
     return `<span class="st live"><i class="ld" aria-hidden="true"></i><span class="clk" data-secs="${m.clockSecs}" data-period="${m.period}" data-fixed="${fixed}">${esc(m.detail)}</span></span>`;
   }
   const moodOf = m => !m || m.state === "pre" ? "" : m.state === "void" ? "void" : m.us > m.them ? "win" : m.us === m.them ? "draw" : "lose";
-  const moodText = (mood, m) => !mood ? "" : mood === "void" ? "Void" : m.state === "post" ? (mood==="win"?"Won":mood==="draw"?"Drew":"Lost") : (mood==="win"?"Winning":mood==="draw"?"Drawing":"Losing");
   const surname = n => String(n||"").replace(/^[A-Z]\.\s*/,"");
-  const minute = c => String(c||"").replace(/'/g,"").replace(/\+/,"+");
+  const minute = c => String(c||"").replace(/'/g,"");
   const goalLabel = g => `${esc(surname(g.name) || "Goal")} ${esc(minute(g.clock))}${g.pen?" pen":""}${g.og?" og":""}`;
 
-  function gameHtml(p, i, m, ch){
-    const d = `--d:${i*110}ms`;
-    if (!p.event){
-      return `<li class="game" style="${d}"><div class="gh"><span class="who">${esc(p.who)}</span><span class="odds">${esc(p.odds||"")}</span><span class="sp"></span><span class="st">${esc(p.ko||"")}</span></div>
-        <div class="row ours"><span class="kit"></span><span class="nm">${esc(p.team)}</span><span class="box"></span></div>
-        <div class="row"><span class="kit"></span><span class="nm">${p.away?"at ":"v "}${esc(p.opponent||"")}</span><span class="box"></span></div>
-        ${p.fs?`<div class="fs">Not in the live feed. <a href="${esc(p.fs)}" target="_blank" rel="noopener">Live score on Flashscore ↗</a></div>`:""}</li>`;
-    }
-    const mood = moodOf(m), key = p.event;
-    const flashing = flashUntil[key] && flashUntil[key] > Date.now();
-    const played = m && (m.state === "in" || m.state === "post");
-    const sides = m ? (m.home ? [[m.usName,m.us,true],[m.themName,m.them,false]] : [[m.themName,m.them,false],[m.usName,m.us,true]]) : [[p.team,"",true],["","",false]];
-    const flips = m ? (m.home ? [ch.usUp, ch.themUp] : [ch.themUp, ch.usUp]) : [false,false];
-    const scorers = isOurs => !m ? "" : m.goals.filter(g => g.ours === isOurs && (g.kind === "goal" || g.kind === "red"))
-      .map(g => g.kind === "red" ? `🟥 ${esc(surname(g.name))} ${esc(minute(g.clock))}` : goalLabel(g)).join(", ");
-    const rowHtml = (s, k) => `<div class="row${s[2]?" ours":""}"><span class="kit"></span><span class="nm">${esc(s[0])}</span><span class="box">${played?`<span class="${flips[k]?"flip":""}">${s[1]}</span>`:""}</span></div>
-      <div class="scorers">${scorers(s[2])}</div>`;
-    let stats = "";
-    if (played){
-      const sx = m.stats, p0 = sx.poss[0], p1 = sx.poss[1];
-      const pair = (label, a, b) => a == null || b == null ? "" : `<div class="sr"><span class="a">${a}</span><span class="l">${label}</span><span class="b">${b}</span></div>`;
-      let possHtml = "";
-      if (p0 != null && p1 != null && p0 + p1 > 0){
-        const w = Math.max(0, Math.min(100, p0/(p0+p1)*100));
-        possHtml = `<div class="poss" role="img" aria-label="Possession ${Math.round(p0)}% to ${Math.round(p1)}%"><span>${Math.round(p0)}%</span><span class="pbar"><i data-k="${esc(key)}" data-w="${w.toFixed(1)}" style="width:${(possPrev[key] ?? 0).toFixed(1)}%"></i></span><span>${Math.round(p1)}%</span></div>`;
-      }
-      const shots = k => sx.shots[k] == null ? null : `${sx.shots[k]} <small>(${sx.onT[k] ?? 0})</small>`;
-      const rows = pair("Shots (on target)", shots(0), shots(1)) + pair("Corners", sx.corners[0], sx.corners[1])
-        + pair("🟨 Yellow", sx.yellow[0], sx.yellow[1]) + (sx.red[0] || sx.red[1] ? pair("🟥 Red", sx.red[0], sx.red[1]) : "");
-      const icon = {goal:"⚽", yellow:"🟨", red:"🟥"};
-      const tl = m.goals.length ? `<div class="cards">${m.goals.map(g => `<span class="ev${g.ours?" us":""}"><b>${esc(g.clock)}</b> ${icon[g.kind]} ${esc(g.name)}</span>`).join("")}</div>` : "";
-      if (possHtml || rows || tl) stats = `<details class="stats" data-k="${esc(key)}"${openStats.has(String(key))?" open":""}><summary>Stats</summary><div class="sgrid"><div class="sh"><span>${esc(m.usName)}</span><span>${esc(m.themName)}</span></div>${possHtml}${rows}${tl}</div></details>`;
-    }
-    const cls = ["game", mood, flashing ? "flash" : ""].filter(Boolean).join(" ");
-    const team = m && m.colour ? `--team:${m.colour};` : "";
-    return `<li class="${cls}" style="${team}${d}">
-      <div class="gh"><span class="who">${esc(p.who)}</span><span class="odds">${esc(p.odds||"")}</span><span class="sp"></span><span class="mood ${mood}">${moodText(mood,m)}</span>${statusChip(m)}</div>
-      ${rowHtml(sides[0],0)}${rowHtml(sides[1],1)}
-      ${stats}
-      ${p.fs?`<div class="fs"><a href="${esc(p.fs)}" target="_blank" rel="noopener">Flashscore ↗</a></div>`:""}
-    </li>`;
+  // Odometer: the new number rolls up into the box.
+  function setScore(box, v, animate){
+    if (v === "" ){ if (box.innerHTML) box.innerHTML = ""; delete box.dataset.v; return; }
+    const cur = box.dataset.v;
+    if (cur === String(v)) return;
+    box.dataset.v = String(v);
+    if (cur === undefined || !animate || reduce){ box.innerHTML = `<span>${v}</span>`; return; }
+    const old = box.querySelector("span:last-child");
+    if (old){ old.className = "out"; setTimeout(() => old.remove(), 600); }
+    box.insertAdjacentHTML("beforeend", `<span class="in">${v}</span>`);
+    box.classList.remove("scored"); void box.offsetWidth; box.classList.add("scored");
+    setTimeout(() => box.classList.remove("scored"), 3300);
   }
 
-  function renderPanel(results, changes){
-    const groups = {};
-    cfg.picks.forEach((p, i) => { const k = p.league || "other"; (groups[k] = groups[k] || []).push(i); });
-    const keys = Object.keys(groups).sort((a,b) => (ORDER.indexOf(a)+1 || 99) - (ORDER.indexOf(b)+1 || 99));
-    let n = 0;
-    $("panel").innerHTML = keys.map(k => {
-      const name = LEAGUES[k] || (k === "other" ? "Other leagues" : k);
-      const head = `<div class="league" style="--d:${n*110}ms">${esc(name)}</div>`;
-      const list = groups[k].map(i => gameHtml(cfg.picks[i], n++, results[i], changes[i])).join("");
-      return head + `<ul class="games">${list}</ul>`;
-    }).join("");
+  function updateGame(key, m, ch){
+    const g = G[key]; if (!g) return;
+    const mood = moodOf(m), played = m && (m.state === "in" || m.state === "post");
+    ["win","draw","lose","void","live"].forEach(c => g.li.classList.toggle(c, c === mood || (c === "live" && m && m.state === "in")));
+    if (m && m.colour) g.li.style.setProperty("--team", m.colour);
+    const chip = statusChip(m);
+    if (g.stw.dataset.sig !== chip){ g.stw.dataset.sig = chip; g.stw.innerHTML = chip; }
+    if (!m) return;
+    const sides = m.home ? [[m.usName,m.us,true],[m.themName,m.them,false]] : [[m.themName,m.them,false],[m.usName,m.us,true]];
+    const ups = m.home ? [ch.usUp, ch.themUp] : [ch.themUp, ch.usUp];
+    sides.forEach((s, k) => {
+      if (g.nm[k].textContent !== s[0]) g.nm[k].textContent = s[0];
+      g.rows[k].classList.toggle("ours", s[2]);
+      setScore(g.box[k], played ? s[1] : "", ups[k]);
+      const sc = m.goals.filter(x => x.ours === s[2] && (x.kind === "goal" || x.kind === "red"))
+        .map(x => x.kind === "red" ? `🟥 ${esc(surname(x.name))} ${esc(minute(x.clock))}` : goalLabel(x)).join(", ");
+      setHTML(g.sc[k], sc);
+    });
+    g.toggle.hidden = !played;
+    if (!played) return;
+    const sx = m.stats;
+    g.sh[0].textContent = m.usName; g.sh[1].textContent = m.themName;
+    const p0 = sx.poss[0], p1 = sx.poss[1];
+    g.poss.hidden = !(p0 != null && p1 != null && p0 + p1 > 0);
+    if (!g.poss.hidden){
+      g.pa.textContent = Math.round(p0) + "%"; g.pb.textContent = Math.round(p1) + "%";
+      const w = Math.max(0, Math.min(100, p0/(p0+p1)*100)).toFixed(1) + "%";
+      if (g.bar.style.width !== w) g.bar.style.width = w; // bar starts at 0 in the page, so this glides
+    }
+    const pair = (label, a, b) => a == null || b == null ? "" : `<div class="sr"><span class="a">${a}</span><span class="l">${label}</span><span class="b">${b}</span></div>`;
+    const shots = k => sx.shots[k] == null ? null : `${sx.shots[k]} <small>(${sx.onT[k] ?? 0})</small>`;
+    setHTML(g.srs, pair("Shots (on target)", shots(0), shots(1)) + pair("Corners", sx.corners[0], sx.corners[1])
+      + pair("🟨 Yellow", sx.yellow[0], sx.yellow[1]) + (sx.red[0] || sx.red[1] ? pair("🟥 Red", sx.red[0], sx.red[1]) : ""));
+    const icon = {goal:"⚽", yellow:"🟨", red:"🟥"};
+    setHTML(g.evs, m.goals.map(x => `<span class="ev${x.ours?" us":""}"><b>${esc(x.clock)}</b> ${icon[x.kind]} ${esc(x.name)}</span>`).join(""));
   }
 
   function renderBottom(results){
-    // Latest goals across our games, newest first (all kick off together, so match minute ≈ order).
     const all = [];
     cfg.picks.forEach((p, i) => {
       const m = results[i]; if (!m || m.state === "pre" || m.state === "void") return;
       m.goals.filter(g => g.kind === "goal").forEach(g => all.push({p, m, g, id: `${p.event}|${g.secs}|${g.name}`}));
     });
     all.sort((a,b) => b.g.secs - a.g.secs);
-    $("goalrows").innerHTML = all.slice(0, 3).map(x => {
-      const {m, g} = x, homeIsUs = m.home;
-      const hn = homeIsUs ? m.usShort : m.themShort, an = homeIsUs ? m.themShort : m.usShort;
-      const hs = homeIsUs ? m.us : m.them, as = homeIsUs ? m.them : m.us;
-      const scoredHome = g.ours === homeIsUs;
+    setHTML($("goalrows"), all.slice(0, 2).map(x => {
+      const {m, g} = x, hu = m.home;
+      const hn = hu ? m.usShort : m.themShort, an = hu ? m.themShort : m.usShort;
+      const hs = hu ? m.us : m.them, as = hu ? m.them : m.us;
       const isNew = !firstPaint && !seenGoals.has(x.id);
-      const fx = scoredHome ? `<span class="sc">${esc(hn)} ${hs}</span> ${esc(an)} ${as}` : `${esc(hn)} ${hs} <span class="sc">${esc(an)} ${as}</span>`;
+      const fx = g.ours === hu ? `<span class="sc">${esc(hn)} ${hs}</span> ${esc(an)} ${as}` : `${esc(hn)} ${hs} <span class="sc">${esc(an)} ${as}</span>`;
       return `<li class="gr${g.ours?" ours":""}${isNew?" new":""}"><span class="tag">Goal</span><span class="fx">${fx}</span><span class="by">${esc(surname(g.name))} (${esc(minute(g.clock))})</span></li>`;
-    }).join("");
+    }).join(""));
     all.forEach(x => seenGoals.add(x.id));
 
     const items = cfg.picks.map((p, i) => {
-      const m = results[i];
-      if (!m) return `<span class="ti"><span class="who">${esc(p.who)}</span>${esc(p.team)} ${p.away?"at":"v"} ${esc(p.opponent||"")} ${esc(p.ko||"")}</span>`;
+      const m = results[i], who = `<span class="who">${esc(p.who)}</span>`;
+      if (!m) return `<span class="ti">${who}${esc(p.team)} ${p.away?"at":"v"} ${esc(p.opponent||"")} ${esc(p.ko||"")}</span>`;
       const hn = m.home ? m.usName : m.themName, an = m.home ? m.themName : m.usName;
-      if (m.state === "pre") return `<span class="ti"><span class="who">${esc(p.who)}</span>${esc(hn)} v ${esc(an)} ${esc(ukTime(m.start))}</span>`;
-      if (m.state === "void") return `<span class="ti"><span class="who">${esc(p.who)}</span>${esc(hn)} P-P ${esc(an)}</span>`;
+      if (m.state === "pre") return `<span class="ti">${who}${esc(hn)} v ${esc(an)} ${esc(ukTime(m.start))}</span>`;
+      if (m.state === "void") return `<span class="ti">${who}${esc(hn)} P-P ${esc(an)}</span>`;
       const by = m.goals.filter(g => g.kind === "goal").map(g => `${surname(g.name)} (${minute(g.clock)})`).join(", ");
-      const sc = `${m.home?m.us:m.them}-${m.home?m.them:m.us}`;
       const tag = m.state === "post" ? " FT" : isHT(m) ? " HT" : "";
-      return `<span class="ti"><span class="who">${esc(p.who)}</span>${esc(hn)} ${sc} ${esc(an)}${tag}${by?`: <span class="by">${esc(by)}</span>`:""}</span>`;
+      return `<span class="ti">${who}${esc(hn)} ${m.home?m.us:m.them}-${m.home?m.them:m.us} ${esc(an)}${tag}${by?`: <span class="by">${esc(by)}</span>`:""}</span>`;
     }).join("");
     if (items !== tickerSig){
       tickerSig = items;
       const t = $("ticker");
       t.innerHTML = items + items;
-      requestAnimationFrame(() => t.style.setProperty("--dur", Math.max(20, Math.round(t.scrollWidth / 2 / 55)) + "s"));
+      requestAnimationFrame(() => t.style.setProperty("--dur", Math.max(20, Math.round(t.scrollWidth / 2 / 50)) + "s"));
     }
     requestAnimationFrame(() => document.body.style.setProperty("--bottom", ($("bottom").offsetHeight + 16) + "px"));
   }
 
   function render(results){
-    let started=0, winning=0, finished=0, lostFinal=false, newGoalOurs=false;
-    const changes = cfg.picks.map((p, i) => {
+    let started=0, winning=0, finished=0, lostFinal=false, ourGoal=false;
+    cfg.picks.forEach((p, i) => {
       const m = results[i], key = p.event, pv = prev[key];
       const ch = {usUp:false, themUp:false};
-      if (!m || m.state === "void") return ch;
-      if (pv && m.state !== "pre"){ ch.usUp = m.us > pv.us; ch.themUp = m.them > pv.them; }
-      prev[key] = {us:m.us, them:m.them};
-      if (ch.usUp || ch.themUp){ flashUntil[key] = Date.now() + 20000; if (ch.usUp) newGoalOurs = true; }
-      const mood = moodOf(m);
-      if (m.state !== "pre") { started++; if (mood==="win") winning++; }
-      if (m.state === "post") { finished++; if (mood!=="win") lostFinal = true; }
-      return ch;
+      if (m && m.state !== "void"){
+        if (pv && m.state !== "pre"){ ch.usUp = m.us > pv.us; ch.themUp = m.them > pv.them; }
+        prev[key] = {us:m.us, them:m.them};
+        if (ch.usUp) ourGoal = true;
+        const mood = moodOf(m);
+        if (m.state !== "pre") { started++; if (mood==="win") winning++; }
+        if (m.state === "post") { finished++; if (mood!=="win") lostFinal = true; }
+      }
+      if (key) updateGame(key, m, ch);
     });
-    renderPanel(results, changes);
     renderBottom(results);
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      document.querySelectorAll(".pbar i[data-w]").forEach(el => { el.style.width = el.dataset.w + "%"; possPrev[el.dataset.k] = +el.dataset.w; });
-    }));
-    if (newGoalOurs && !firstPaint && navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) { try { navigator.vibrate([120,60,120]); } catch(_){} }
+    if (ourGoal && !firstPaint && navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) { try { navigator.vibrate([120,60,120]); } catch(_){} }
 
-    $("lights").innerHTML = cfg.picks.map((p, i) => {
-      const m = results[i], mood = moodOf(m), st = m ? m.state : "off";
-      const mark = mood === "void" ? "–" : m && m.state === "post" ? (mood === "win" ? "✓" : "✕") : "";
-      return `<li class="lt ${mood} ${st}" style="--d:${i*110}ms" title="${esc(p.who)}: ${esc(p.team)}"><span class="bulb">${mark}</span><span class="nm">${esc(p.who)}</span></li>`;
-    }).join("");
+    $("lights").querySelectorAll(".lt").forEach((li, i) => {
+      const m = results[i], mood = moodOf(m);
+      li.className = ["lt", mood, m ? m.state : ""].filter(Boolean).join(" ");
+    });
 
     const voids = cfg.picks.filter((p,i)=>results[i] && results[i].state === "void").map(p=>p.team);
     const tracked = cfg.picks.filter((p,i)=>p.event && !(results[i] && results[i].state === "void")).length;
@@ -425,27 +431,28 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offs
       const first = results.filter(Boolean).map(m=>m.start.getTime()).sort((a,b)=>a-b)[0];
       koAt = first || 0;
       summary = `Kick-off <span class="n">${first ? esc(ukTime(new Date(first))) : ""}</span> <span id="cd"></span>`;
-    } else if (finished === tracked) summary = `Full time · <span class="n">${winning} of ${tracked}</span> won`;
-    else summary = `<span class="n">${winning} of ${started}</span> winning right now${finished?` · ${finished} finished`:""}`;
+    } else if (finished === tracked) summary = `Full time: <span class="n">${winning} of ${tracked}</span> won`;
+    else summary = `<span class="n">${winning} of ${started}</span> winning`;
     const allWin = started && cfg.picks.every((p,i)=>!p.event || ["win","void"].includes(moodOf(results[i])));
-    if (lostFinal) { verdict = "Acca's gone: one pick has lost"; vclass = "lose"; }
-    else if (started) {
-      verdict = allWin ? `If it ended now, the acca lands${extra.length?` (plus ${extra.join(", ")})`:""} 🎉` : "If it ended now, the acca loses";
-      vclass = allWin ? "win" : "lose";
-    }
-    if (voids.length) verdict += `${verdict ? " · " : ""}${voids.join(", ")} off: that leg is void`;
-    $("hud").className = "clock" + (allWin && !lostFinal ? " oncourse" : "");
-    $("summary").innerHTML = summary;
-    $("verdict").textContent = verdict; $("verdict").className = "verdict " + vclass;
+    if (lostFinal) { verdict = "Acca's gone"; vclass = "lose"; }
+    else if (started) { verdict = allWin ? `Acca on${extra.length?` (plus ${extra.join(", ")})`:""} 🎉` : "Acca's losing as it stands"; vclass = allWin ? "win" : "lose"; }
+    if (voids.length) verdict += `${verdict ? " · " : ""}${voids.join(", ")} void`;
+    $("hud").classList.toggle("oncourse", !!allWin && !lostFinal);
+    setHTML($("summary"), summary + (verdict ? ` · <span class="v ${vclass}">${esc(verdict)}</span>` : ""));
     tickClocks();
-    if (firstPaint){ firstPaint = false; setTimeout(() => $("wrap").classList.remove("intro"), 2600); }
+    if (firstPaint){ firstPaint = false; setTimeout(() => $("wrap").classList.remove("intro"), 2000); }
   }
 
-  // Keep "Stats" open across the 30-second refresh.
-  document.addEventListener("toggle", e => {
-    const d = e.target; if (!d.matches || !d.matches("details.stats")) return;
-    if (d.open) openStats.add(d.dataset.k); else openStats.delete(d.dataset.k);
-  }, true);
+  // Stats drawer: tap to slide open/closed; state survives refreshes because the page isn't redrawn.
+  $("panel").addEventListener("click", e => {
+    const b = e.target.closest(".toggle"); if (!b) return;
+    const li = b.closest(".game"), open = li.classList.toggle("open");
+    b.setAttribute("aria-expanded", String(open));
+  });
+  // Ticker pauses while touched or hovered.
+  const tb = $("tickerBox");
+  ["pointerdown","mouseenter"].forEach(ev => tb.addEventListener(ev, () => tb.classList.add("hold")));
+  ["pointerup","pointercancel","mouseleave"].forEach(ev => tb.addEventListener(ev, () => tb.classList.remove("hold")));
 
   function tickClocks(){
     $("time").textContent = nowClock();
@@ -454,7 +461,8 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offs
     document.querySelectorAll(".clk").forEach(c => {
       if (c.dataset.fixed === "1") return;
       const cap = +c.dataset.period === 1 ? 45 : 90;
-      c.textContent = Math.min(Math.floor((+c.dataset.secs + gone) / 60) + 1, cap) + "'";
+      const t = Math.min(Math.floor((+c.dataset.secs + gone) / 60) + 1, cap) + "'";
+      if (c.textContent !== t) c.textContent = t;
     });
     const cd = $("cd");
     if (cd && koAt){
