@@ -193,8 +193,11 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
 .lr.final .face{filter:grayscale(1)}
 .ti .face{display:inline-block;width:16px;height:16px;vertical-align:-3px;margin-right:4px}
 /* Head pop-up on goals */
-.pop{position:fixed;z-index:40;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(var(--bottom,90px) - 6px);display:flex;align-items:flex-end;gap:8px;pointer-events:none;transform:translateY(140%);transition:transform .5s cubic-bezier(.3,1.5,.5,1)}
-.pop.show{transform:none}
+.pop{position:fixed;z-index:40;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(var(--bottom,90px) - 6px);display:flex;align-items:flex-end;gap:8px;pointer-events:none;
+  /* Idle: pushed fully below the screen AND invisible, so no half-head peeks out */
+  transform:translateY(calc(100% + var(--bottom,90px) + 40px));opacity:0;visibility:hidden;
+  transition:transform .45s cubic-bezier(.5,0,.75,0),opacity .25s .2s,visibility 0s .45s}
+.pop.show{transform:none;opacity:1;visibility:visible;transition:transform .5s cubic-bezier(.3,1.5,.5,1),opacity .15s,visibility 0s}
 .pop .face{width:84px;height:84px;box-shadow:0 0 0 4px #fff,0 12px 30px -8px rgba(0,0,0,.7)}
 .pop .bub{position:relative;margin-bottom:56px;background:#fff;color:var(--ink);font:900 20px var(--body);font-stretch:80%;text-transform:uppercase;padding:8px 14px;border-radius:14px;white-space:nowrap;box-shadow:0 10px 24px -10px rgba(0,0,0,.6)}
 .pop .bub::before{content:"";position:absolute;left:-7px;bottom:10px;border:8px solid transparent;border-right-color:#fff;border-left:0}
