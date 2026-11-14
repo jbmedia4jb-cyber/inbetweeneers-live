@@ -92,6 +92,12 @@ h1 .live i{width:7px;height:7px;border-radius:50%;background:#fff}
 .st.live .ld{width:6px;height:6px;border-radius:50%;background:#fff}
 .st.ht{background:rgba(255,194,61,.16);color:var(--draw)}
 .st.ft{background:var(--ink);color:#06101c}
+.st.void{background:rgba(255,255,255,.12);color:var(--ink)}
+.mood.void{color:var(--muted)}
+.card.void{opacity:.62;filter:grayscale(.6)}
+.lt.void .bulb{background:#55627a;color:#e6ecf5}
+.stale{background:rgba(255,212,71,.12);box-shadow:inset 0 0 0 1px rgba(255,212,71,.45);border-radius:10px;padding:10px 12px;font-size:13px}
+.backup{color:var(--ink)}
 
 .sb{display:grid;gap:6px}
 .row{display:grid;grid-template-columns:5px minmax(0,1fr) 46px;align-items:center;gap:10px}
@@ -204,12 +210,14 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   <div class="foot">
     <p><a class="btn" id="accaLink" href="#">← Back to the acca table</a></p>
     <p>Scores and stats from ESPN, checked every 30 seconds while this page is open. Scottish leagues aren't in that feed. If the page has been in the background, pull down or reopen to refresh.</p>
+    <p>Backup if scores stop updating: <a href="https://www.bbc.co.uk/sport/football/scores-fixtures" target="_blank" rel="noopener">BBC live scores ↗</a></p>
   </div>
 </div>
 <div class="takeover" id="goal" hidden aria-live="assertive"></div>
 <script>
 (function(){
   const POLL_MS = 30000;
+  const BACKUP = "https://www.bbc.co.uk/sport/football/scores-fixtures";
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
   const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -224,7 +232,11 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     const ok = x => /^[0-9a-f]{6}$/i.test(x||"");
     const lum = x => { const n = parseInt(x,16); return (0.299*(n>>16) + 0.587*(n>>8&255) + 0.114*(n&255))/255; };
     for (const c of [t.color, t.alternateColor]) if (ok(c) && lum(c) > 0.3 && lum(c) < 0.93) return "#"+c;
-    if (ok(t.color)) return `color-mix(in srgb, #${t.color} 50%, #ffffff)`;
+    if (ok(t.color)){ // too dark or too light: blend halfway to white (works on older phones too)
+      const n = parseInt(t.color,16), mix = v => Math.round((v + 255) / 2);
+      const rgb = [n>>16, n>>8&255, n&255].map(mix);
+      return lum(t.color) >= 0.93 ? "" : "#" + rgb.map(v => v.toString(16).padStart(2,"0")).join("");
+    }
     return "";
   }
 
@@ -234,6 +246,10 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     cfg = await r.json();
     $("date").textContent = ukDate(cfg.date);
     if (cfg.accaPage && /^https:\/\/claude\.ai\//.test(cfg.accaPage)) $("accaLink").href = cfg.accaPage;
+    // Old picks? Say so, rather than quietly showing last week's games.
+    const todayUK = new Date().toLocaleDateString("en-CA", {timeZone:"Europe/London"});
+    const daysOld = Math.round((new Date(todayUK) - new Date(cfg.date)) / 864e5);
+    if (daysOld >= 2) $("hud").insertAdjacentHTML("beforebegin", `<div class="stale">These are the picks from ${esc(ukDate(cfg.date))}. This week's haven't been added yet.</div>`);
   }
 
   async function fetchLeague(lg){
@@ -268,8 +284,10 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
       yellow: [cardCount(true,"yellow"), cardCount(false,"yellow")],
       red: [cardCount(true,"red"), cardCount(false,"red")]
     };
+    // Postponed, cancelled or abandoned: the bookies void that leg, so it isn't a loss.
+    const voided = /POSTPONED|CANCEL|ABANDON|SUSPENDED|DELAYED/i.test(st.name || "") || (st.state === "post" && !st.completed && /postpon|cancel|abandon/i.test(st.description || ""));
     return {
-      state: st.state, // pre | in | post
+      state: voided ? "void" : st.state, // pre | in | post | void
       detail: st.shortDetail || st.description || "",
       completed: !!st.completed,
       clockSecs: +status.clock || 0, period: +status.period || 0,
@@ -287,13 +305,14 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   function statusChip(m){
     if (!m) return `<span class="st">–</span>`;
     if (m.state === "pre") return `<span class="st">${esc(ukTime(m.start))}</span>`;
+    if (m.state === "void") return `<span class="st void">${esc(m.detail || "Off")}</span>`;
     if (m.state === "post") return `<span class="st ft">FT</span>`;
     if (isHT(m)) return `<span class="st ht">HT</span>`;
     const fixed = /\+/.test(m.detail) || !m.clockSecs ? 1 : 0;
     return `<span class="st live"><i class="ld" aria-hidden="true"></i><span class="clk" data-secs="${m.clockSecs}" data-period="${m.period}" data-fixed="${fixed}">${esc(m.detail)}</span></span>`;
   }
-  const moodOf = m => !m || m.state === "pre" ? "" : m.us > m.them ? "win" : m.us === m.them ? "draw" : "lose";
-  const moodText = (mood, m) => !mood ? "" : m.state === "post" ? (mood==="win"?"Won":mood==="draw"?"Drew":"Lost") : (mood==="win"?"Winning":mood==="draw"?"Drawing":"Losing");
+  const moodOf = m => !m || m.state === "pre" ? "" : m.state === "void" ? "void" : m.us > m.them ? "win" : m.us === m.them ? "draw" : "lose";
+  const moodText = (mood, m) => !mood ? "" : mood === "void" ? "Void" : m.state === "post" ? (mood==="win"?"Won":mood==="draw"?"Drew":"Lost") : (mood==="win"?"Winning":mood==="draw"?"Drawing":"Losing");
   const homeScore = m => `${m.home?m.us:m.them}-${m.home?m.them:m.us}`;
   const cu = n => n == null ? null : `<span class="cu" data-n="${n}">${n}</span>`;
 
@@ -307,7 +326,7 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     }
     const mood = moodOf(m), key = p.event, now = Date.now();
     const flashing = flashUntil[key] && flashUntil[key] > now;
-    const played = m && m.state !== "pre";
+    const played = m && (m.state === "in" || m.state === "post");
     const homeLine = m ? (m.home ? [m.usName,m.us,true] : [m.themName,m.them,false]) : [p.team,"",true];
     const awayLine = m ? (m.home ? [m.themName,m.them,false] : [m.usName,m.us,true]) : ["","",false];
     const homeFlip = m && (m.home ? ch.usUp : ch.themUp), awayFlip = m && (m.home ? ch.themUp : ch.usUp);
@@ -347,8 +366,8 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
       const m = results[i];
       if (!m) return `<span class="ti"><b>${esc(p.who)}</b><span class="sc">${esc(p.team)}</span><em>${esc(p.ko||"")}</em></span>`;
       const h = m.home ? m.usAbbr : m.themAbbr, a = m.home ? m.themAbbr : m.usAbbr;
-      const sc = m.state === "pre" ? `${h} v ${a}` : `${h} ${homeScore(m)} ${a}`;
-      const clk = m.state === "pre" ? ukTime(m.start) : m.state === "post" ? "FT" : isHT(m) ? "HT" : m.detail;
+      const sc = m.state === "pre" || m.state === "void" ? `${h} v ${a}` : `${h} ${homeScore(m)} ${a}`;
+      const clk = m.state === "pre" ? ukTime(m.start) : m.state === "void" ? "OFF" : m.state === "post" ? "FT" : isHT(m) ? "HT" : m.detail;
       return `<span class="ti ${moodOf(m)}"><b>${esc(p.who)}</b><span class="sc">${esc(sc)}</span><em>${esc(clk)}</em></span>`;
     }).join(`<span class="sep">◆</span>`);
     if (items === tickerSig) return;
@@ -364,7 +383,7 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     const changes = cfg.picks.map((p, i) => {
       const m = results[i], key = p.event, pv = prev[key];
       const ch = {usUp:false, themUp:false};
-      if (!m) return ch;
+      if (!m || m.state === "void") return ch;
       if (pv && m.state !== "pre"){ ch.usUp = m.us > pv.us; ch.themUp = m.them > pv.them; }
       prev[key] = {us:m.us, them:m.them};
       if (ch.usUp || ch.themUp){ flashUntil[key] = Date.now() + 20000; goalsNow.push({p, m, ours: ch.usUp}); }
@@ -383,12 +402,13 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
     $("lights").innerHTML = cfg.picks.map((p, i) => {
       const m = results[i], mood = moodOf(m), st = m ? m.state : "off";
-      const mark = m && m.state === "post" ? (mood === "win" ? "✓" : "✕") : "";
+      const mark = mood === "void" ? "–" : m && m.state === "post" ? (mood === "win" ? "✓" : "✕") : "";
       return `<li class="lt ${mood} ${st}" style="--d:${i*110}ms" title="${esc(p.who)}: ${esc(p.team)}"><span class="bulb">${mark}</span><span class="nm">${esc(p.who)}</span></li>`;
     }).join("");
     renderTicker(results);
 
-    const tracked = cfg.picks.filter(p=>p.event).length;
+    const voids = cfg.picks.filter((p,i)=>results[i] && results[i].state === "void").map(p=>p.team);
+    const tracked = cfg.picks.filter((p,i)=>p.event && !(results[i] && results[i].state === "void")).length;
     const extra = cfg.picks.filter(p=>!p.event).map(p=>p.team);
     let summary, verdict = "", vclass = "";
     koAt = 0;
@@ -398,12 +418,13 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
       summary = `Kick-off <span class="n">${first ? esc(ukTime(new Date(first))) : ""}</span> <span id="cd"></span>`;
     } else if (finished === tracked) summary = `Full time · <span class="n">${winning} of ${tracked}</span> won`;
     else summary = `<span class="n">${winning} of ${started}</span> winning right now${finished?` · ${finished} finished`:""}`;
-    const allWin = started && cfg.picks.every((p,i)=>!p.event || moodOf(results[i])==="win");
+    const allWin = started && cfg.picks.every((p,i)=>!p.event || ["win","void"].includes(moodOf(results[i])));
     if (lostFinal) { verdict = "Acca's gone: one pick has lost"; vclass = "lose"; }
     else if (started) {
       verdict = allWin ? `If it ended now, the acca lands${extra.length?` (plus ${extra.join(", ")})`:""} 🎉` : "If it ended now, the acca loses";
       vclass = allWin ? "win" : "lose";
     }
+    if (voids.length) verdict += `${verdict ? " · " : ""}${voids.join(", ")} off: that leg is void`;
     $("hud").className = "hud" + (allWin && finished === tracked && tracked ? " landed" : allWin ? " oncourse" : "");
     $("summary").innerHTML = summary;
     $("verdict").textContent = verdict; $("verdict").className = "verdict " + vclass;
@@ -468,7 +489,7 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
       render(results);
       const err = $("err"); if (err) err.remove();
     } catch(e){
-      if (!$("err")) $("cards").insertAdjacentHTML("beforebegin", `<div class="err" id="err">Couldn't reach the live scores just now. Trying again in 30 seconds.</div>`);
+      if (!$("err")) $("cards").insertAdjacentHTML("beforebegin", `<div class="err" id="err">Couldn't reach the live scores just now. Trying again in 30 seconds. Meanwhile: <a class="backup" href="${BACKUP}" target="_blank" rel="noopener">BBC live scores ↗</a></div>`);
     }
   }
   setInterval(tickClocks, 1000);
