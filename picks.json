@@ -1,11 +1,11 @@
 {
-  "date": "2026-11-07",
+  "date": "2026-11-14",
   "accaPage": "https://claude.ai/artifact/EmE4QdFYEC6DfJrWAN7QBd",
   "picks": [
-    { "who": "Coxy",   "team": "Crewe Alexandra",     "odds": "13/10", "league": "eng.fa", "event": "401931120", "espnTeam": "Crewe Alexandra",     "fs": "https://www.flashscore.co.uk/match/football/crewe-YacqHHdS/wimbledon-4KREuF43/?mid=xWNKTV05" },
-    { "who": "Poisky", "team": "West Brom",           "odds": "19/20", "league": "eng.2",  "event": "401880162", "espnTeam": "West Bromwich Albion", "fs": "https://www.flashscore.co.uk/match/football/millwall-6uz2cJBL/west-brom-CCBWpzjj/?mid=xAl13c36" },
-    { "who": "Blacky", "team": "Sheffield United",    "odds": "19/20", "league": "eng.2",  "event": "401880168", "espnTeam": "Sheffield United",    "fs": "https://www.flashscore.co.uk/match/football/charlton-fXf5mQ7t/sheffield-utd-MeKPSerA/?mid=fVhEhtkl" },
-    { "who": "JT",     "team": "Birmingham City",     "odds": "4/5",   "league": "eng.2",  "event": "401880172", "espnTeam": "Birmingham City",     "fs": "https://www.flashscore.co.uk/match/football/birmingham-SWk4muv7/swansea-K6xezbY7/?mid=z1fGWRPp" },
-    { "who": "Browns", "team": "Hamilton Academical", "odds": "4/7",   "league": null,     "event": null,        "opponent": "Cove Rangers", "away": true, "ko": "3pm", "fs": "https://www.flashscore.co.uk/match/football/cove-rangers-4CIh5uRh/hamilton-4QLusDEd/?mid=QsThnZ3t" }
+    { "who": "Browns", "team": "Gillingham",          "odds": "12/5",  "league": "eng.4", "event": "401881275", "espnTeam": "Gillingham" },
+    { "who": "Poisky", "team": "Blackpool",           "odds": "31/20", "league": "eng.3", "event": "401880754", "espnTeam": "Blackpool" },
+    { "who": "Blacky", "team": "Sheffield Wednesday", "odds": "27/20", "league": "eng.3", "event": "401880747", "espnTeam": "Sheffield Wednesday" },
+    { "who": "Coxy",   "team": "Salford City",        "odds": "11/20", "league": "eng.4", "event": "401881268", "espnTeam": "Salford City" },
+    { "who": "JT",     "team": "Carlisle United",     "odds": "4/9",   "league": "eng.5", "event": "401889212", "espnTeam": "Carlisle United" }
   ]
 }

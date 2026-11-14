@@ -167,7 +167,7 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
           <div class="line${awayLine[2]?" ours":""}"><span class="nm">${esc(awayLine[0])}</span><span class="g">${m&&m.state!=="pre"?awayLine[1]:""}</span></div></div>
         <div class="side">${statusChip(m)}<span class="mood ${mood}">${moodText(mood,m)}</span></div>
         ${gl?`<div class="goals"><span>${gl}</span></div>`:""}
-        <div class="fs"><a href="${esc(p.fs)}" target="_blank" rel="noopener">Flashscore ↗</a></div>
+        ${p.fs?`<div class="fs"><a href="${esc(p.fs)}" target="_blank" rel="noopener">Flashscore ↗</a></div>`:""}
       </li>`;
     }).join("");
     const tracked = cfg.picks.filter(p=>p.event).length;
