@@ -1,22 +1,22 @@
 {
-  "date": "2026-11-14",
+  "date": "2026-11-21",
   "accaPage": "https://claude.ai/artifact/EmE4QdFYEC6DfJrWAN7QBd",
   "stake": 25,
   "season": {
-    "note": "Season losses up to and including Sat 7 Nov",
+    "note": "Season losses up to and including Sat 14 Nov",
     "losses": {
       "JT": 11,
       "Blacky": 8,
-      "Browns": 7,
-      "Poisky": 7,
-      "Coxy": 6
+      "Poisky": 8,
+      "Browns": 8,
+      "Coxy": 7
     }
   },
   "picks": [
-    { "who": "Browns", "team": "Gillingham", "odds": "12/5", "league": "eng.4", "event": "401881275", "espnTeam": "Gillingham" },
-    { "who": "Poisky", "team": "Blackpool", "odds": "31/20", "league": "eng.3", "event": "401880754", "espnTeam": "Blackpool" },
-    { "who": "Blacky", "team": "Sheffield Wednesday", "odds": "27/20", "league": "eng.3", "event": "401880747", "espnTeam": "Sheffield Wednesday" },
-    { "who": "Coxy", "team": "Salford City", "odds": "11/20", "league": "eng.4", "event": "401881268", "espnTeam": "Salford City" },
-    { "who": "JT", "team": "Carlisle United", "odds": "4/9", "league": "eng.5", "event": "401889212", "espnTeam": "Carlisle United" }
+    { "who": "Browns", "team": "Salford City", "odds": "1/1", "league": "eng.4", "event": "401881264", "espnTeam": "Salford City" },
+    { "who": "Poisky", "team": "Bournemouth", "odds": "10/11", "league": "eng.1", "event": "401879238", "espnTeam": "AFC Bournemouth" },
+    { "who": "Blacky", "team": "Aston Villa", "odds": "3/4", "league": "eng.1", "event": "401878756", "espnTeam": "Aston Villa" },
+    { "who": "Coxy", "team": "Grimsby Town", "odds": "8/15", "league": "eng.4", "event": "401881258", "espnTeam": "Grimsby Town" },
+    { "who": "JT", "team": "Tottenham Hotspur", "odds": "12/25", "league": "eng.1", "event": "401878754", "espnTeam": "Tottenham Hotspur" }
   ]
 }
